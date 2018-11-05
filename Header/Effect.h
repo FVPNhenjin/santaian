@@ -36,6 +36,8 @@ public:
 		se.dan6 = 21;
 		se.dan7 = 22;
 		se.dan8 = 23;
+		se.bomb_fast = 24;
+		se.bomb_slow = 25;
 		// LoadSoudnMemを使った場合　半分黒歴史
 		char dir[255];
 		GetCurrentDirectory(255, dir);
@@ -70,7 +72,8 @@ public:
 		SoundEffect[se.spellend] = LoadSoundMem("spellend.mp3");
 		SoundEffect[se.miss] = LoadSoundMem("miss.mp3");
 		SoundEffect[se.karakaze] = LoadSoundMem("karakaze.mp3");
-		
+		SoundEffect[se.bomb_fast] = LoadSoundMem("bomb_fast.mp3");
+		SoundEffect[se.bomb_slow] = LoadSoundMem("bomb_slow.mp3");
 		
 		/*
 		f = _chdir("data");
@@ -148,6 +151,8 @@ public:
 		se.dan6 = 21;
 		se.dan7 = 22;
 		se.dan8 = 23;
+		se.bomb_fast = 24;
+		se.bomb_slow = 25;
 		karakkazekakudo = eff->karakkazekakudo;
 		karakkazewarning = eff->karakkazewarning;
 		SEVolume = eff->SEVolume;
@@ -175,6 +180,8 @@ public:
 		SoundEffect[se.spellend] = eff->SoundEffect[se.spellend];
 		SoundEffect[se.miss] = eff->SoundEffect[se.miss];
 		SoundEffect[se.karakaze] = eff->SoundEffect[se.karakaze];
+		SoundEffect[se.bomb_fast] = eff->SoundEffect[se.bomb_fast];
+		SoundEffect[se.bomb_slow] = eff->SoundEffect[se.bomb_slow];
 	}
 	void SetEffect(int x,int y,int ef){
 		if (ecount == 0){ ClearEffect(); }
@@ -348,7 +355,7 @@ public:
 		return r;
 	}
 	void StopSE(int senum){
-		//StopSoundMem(SoundEffect[senum]);
+		StopSoundMem(SoundEffect[senum]);
 	}
 	int SEVolume;
 	struct SE{
@@ -375,6 +382,8 @@ public:
 		int powerup;
 		int powermax;
 		int karakaze;
+		int bomb_fast;
+		int bomb_slow;
 	};
 	SE se;
 	int countitem;//取得した累積アイテム数に従ってアイテム取得SEを繰り返すための変数です。

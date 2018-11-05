@@ -29,7 +29,7 @@ public:
 		for (i = 0; i < 4; i++){
 			for (j = 0; j < 4; j++){
 				dot[i][j] = 0;
-				shotdot[i][j] = 0;
+				//shotdot[i][j] = 0;
 			}
 		}
 		ClearShot();
@@ -49,25 +49,39 @@ public:
 		dot[3][2] = LoadGraph("Sakuyaright.bmp");
 		jikistand[0][1] = LoadGraph("Futo.common.png");
 		jikistand[0][2] = LoadGraph("Futo.fine.png");
+		jikistand[0][3] = LoadGraph("Futo.question.png");
 		jikistand[0][4] = LoadGraph("Futo.doubt.png");
-		jikistand[0][6] = LoadGraph("Futo.surprised.png");
+		jikistand[0][5] = LoadGraph("Futo.angry.png");
 		jikistand[0][7] = LoadGraph("Futo.amaged.png");
+		jikistand[0][6] = LoadGraph("Futo.surprised.png");		
 		jikistand[0][8] = LoadGraph("Futo.excited.png");
 		jikistand[0][9] = LoadGraph("Futo.strategy.png");
 		jikistand[1][1] = LoadGraph("Mima.common.png");
 		jikistand[1][2] = LoadGraph("Mima.fine.png");
 		jikistand[1][3] = LoadGraph("Mima.question.png");
+		jikistand[1][4] = LoadGraph("Mima.doubt.png");
+		jikistand[1][5] = LoadGraph("Mima.angry.png");
+		jikistand[1][7] = LoadGraph("Mima.amaged.png");		
+		jikistand[1][6] = LoadGraph("Mima.surprised.png");
 		jikistand[1][8] = LoadGraph("Mima.excited.png");
 		jikistand[1][9] = LoadGraph("Mima.strategy.png");
 		jikistand[2][1] = LoadGraph("Sanae.common.png");
 		jikistand[2][2] = LoadGraph("Sanae.fine.png");
 		jikistand[2][3] = LoadGraph("Sanae.question.png");
+		jikistand[2][4] = LoadGraph("Sanae.doubt.png");
+		jikistand[2][5] = LoadGraph("Sanae.angry.png");		
+		jikistand[2][7] = LoadGraph("Sanae.amaged.png");
 		jikistand[2][6] = LoadGraph("Sanae.surprised.png");
+		jikistand[2][8] = LoadGraph("Sanae.excited.png");
 		jikistand[2][9] = LoadGraph("Sanae.strategy.png");
 		jikistand[3][1] = LoadGraph("Sakuya.common.png");
 		jikistand[3][2] = LoadGraph("Sakuya.fine.png");
 		jikistand[3][3] = LoadGraph("Sakuya.question.png");
+		jikistand[3][4] = LoadGraph("Sakuya.doubt.png");
 		jikistand[3][5] = LoadGraph("Sakuya.angry.png");
+		jikistand[3][7] = LoadGraph("Sakuya.amaged.png");
+		jikistand[3][6] = LoadGraph("Sakuya.surprised.png");
+		jikistand[3][8] = LoadGraph("Sakuya.excited.png");
 		jikistand[3][9] = LoadGraph("Sakuya.strategy.png");
 		r = _chdir("shot");
 		shotdot[0][0] = LoadGraph("Futo_shot1.bmp");//高
@@ -96,6 +110,7 @@ public:
 		doublebuttle = false;
 		Init();
 	}
+	//全Stageクラスにデータをコピー
 	void Jiki::Init(){
 		s1.Init();
 		s2.Input_Address(&s1);
@@ -130,6 +145,8 @@ public:
 		//f6b.danmaku.eff.Input_Address(&s1.eff);
 		//ex.danmaku.eff.Input_Address(&s1.eff);
 	}
+
+	//ショットデータを初期化
 	void Jiki::ClearShot(){
 		int p;
 		for (p = 0; p < SHOTLIMIT; p++){
@@ -158,6 +175,8 @@ public:
 		shot[0].np = 1;
 		tail = 1;
 	}
+	
+	//ショットデータを読み込み
 	void Jiki::LoadShot(){
 		int r;
 		r = _chdir("data");
@@ -202,6 +221,287 @@ public:
 		r = _chdir("..");
 		r = _chdir("..");
 	}
+	
+	//自機位置からショットを配置
+	void Jiki::SetShot(int flame) {
+		int shotkazu, shotsu, p, preshotcount;
+		shotsu = 0;
+		if (shotcount == 0 && tail == 0) {
+			//一発目の弾幕はshot[0].npに配置
+			p = shot[0].np;
+		}
+		else {
+			//それ以外はtailに配置
+			p = tail;
+		}
+		if (p == 0) {
+			p = 0;
+		}
+
+		if (j.slow && jikinum != 3) {
+			jikinum += 4;
+		}
+		preshotcount = shotcount;
+		shotkazu = (int)(shotdata[jikinum][j.powercount][0].x);
+		if (shotcount + shotkazu > SHOTLIMIT) {
+			ShotRefresh();
+		}
+		while (shotkazu != 0) {
+			if (/*(*/flame % shotdata[jikinum][j.powercount][shotkazu].shotbetween == 0/* || (flame + 1) % shotdata[jikinum][j.powercount][shotkazu].shotbetween == 0)*/) {
+				shot[p].imggapp = shotdata[jikinum][j.powercount][shotkazu].imggapp;
+				shot[p].imgp = shotdata[jikinum][j.powercount][shotkazu].imgp;
+				if (shot[p].imgp == shotdot[3][1] && (slowkakudo != 0 || sakuyaopkakudo != 0)) {
+					double x, y;
+					x = shotdata[jikinum][j.powercount][shotkazu].x * cos(slowkakudo * PI / 180) - shotdata[jikinum][j.powercount][shotkazu].y * sin(slowkakudo * PI / 180);
+					y = shotdata[jikinum][j.powercount][shotkazu].x * sin(slowkakudo * PI / 180) + shotdata[jikinum][j.powercount][shotkazu].y * cos(slowkakudo * PI / 180);
+					if (shotdata[jikinum][j.powercount][shotkazu].x > 0) {
+						shot[p].x = j.x + x * cos(sakuyaopkakudo * PI / 180) + y * sin(sakuyaopkakudo * PI / 180);
+						shot[p].y = j.y + x * sin(sakuyaopkakudo * PI / 180) - y * cos(sakuyaopkakudo * PI / 180);
+					}
+					else {
+						shot[p].x = j.x + x * cos(sakuyaopkakudo * PI / 180) - y * sin(sakuyaopkakudo * PI / 180);
+						if (sakuyaopkakudo < 0) {
+							shot[p].y = j.y - y * sin(sakuyaopkakudo * PI / 180) - y * cos(sakuyaopkakudo * PI / 180);
+						}
+						else {
+							shot[p].y = j.y + y * sin(sakuyaopkakudo * PI / 180) + y * cos(sakuyaopkakudo * PI / 180);
+						}
+					}
+					if (sakuyaopkakudo != 0) {
+						shot[p].vecy = shotdata[jikinum][j.powercount][shotkazu].vecx * sin(sakuyaopkakudo * PI / 180) * -1 + shotdata[jikinum][j.powercount][shotkazu].vecy * cos(sakuyaopkakudo * PI / 180);
+						shot[p].vecx = shotdata[jikinum][j.powercount][shotkazu].vecx * cos(sakuyaopkakudo * PI / 180) * -1 - shotdata[jikinum][j.powercount][shotkazu].vecy * sin(sakuyaopkakudo * PI / 180);
+						shot[p].imgangle = (int)(atan2(shot[p].vecx, shot[p].vecy * -1) * 180 / PI);
+					}
+					else {
+						shot[p].vecx = shotdata[jikinum][j.powercount][shotkazu].vecx;
+						shot[p].vecy = shotdata[jikinum][j.powercount][shotkazu].vecy;
+						shot[p].imgangle = shotdata[jikinum][j.powercount][shotkazu].imgangle;
+					}
+				}
+				else {
+					shot[p].x = j.x + shotdata[jikinum][j.powercount][shotkazu].x;
+					shot[p].y = j.y + shotdata[jikinum][j.powercount][shotkazu].y;
+					shot[p].vecx = shotdata[jikinum][j.powercount][shotkazu].vecx;
+					shot[p].vecy = shotdata[jikinum][j.powercount][shotkazu].vecy;
+					shot[p].imgangle = shotdata[jikinum][j.powercount][shotkazu].imgangle;
+				}
+				shot[p].flamebetween = shotdata[jikinum][j.powercount][shotkazu].flamebetween;
+				shot[p].power = shotdata[jikinum][j.powercount][shotkazu].power;
+				if (shot[p].imgp == shotdot[2][2] && j.slow && ((shotdata[jikinum][j.powercount][shotkazu].x > 0 && shotdata[jikinum][j.powercount][shotkazu].vecx < 0) || (shotdata[jikinum][j.powercount][shotkazu].x < 0 && shotdata[jikinum][j.powercount][shotkazu].vecx > 0))) {
+					shott[p].changed = 0;
+					shott[p].slow = true;
+				}
+				shot[p].pp = p - 1;
+				shot[p].np = p + 1;
+				shotsu++;
+				shotcount++;
+				p++;
+			}
+			shotkazu--;
+		}
+		tail += shotsu;
+		AddScore(1);
+		if (jikinum > 3) {
+			jikinum -= 4;
+		}
+
+	}
+	
+	//fps毎のショットデータ処理
+	int Jiki::ProcessShot(int flame) {
+		int p = shot[0].np;
+		int r = 0;
+		while (p != tail && r == 0 && shotcount > 0) {
+			if (shot[p].imgp == shotdot[1][2]) {
+				if (j.slow == false || ctrl.GetButton("ok_shot") == 0) { shott[p].slowcancel = true; }
+				if (shott[p].slowcancel == false) {
+					shot[p].x = j.x;
+				}
+				/*
+				if (j.slow && ctrl.GetButton("slow") % 360 == 0){
+				ClearShot();
+				ctrl.SetButtonInit();
+				break;n
+				}*/
+			}
+
+
+			if (shot[p].imgp == shotdot[1][4] && j.slow && j.powercount > 2) {//パワーカウントが第三段階以上でかつ低速移動中で影ビームの処理時
+				if (ctrl.GetButton("left") == 0 && ctrl.GetButton("right") == 0) {
+					//スライド移動していない時は残留ビームは発生しない
+					if (shott[p].beamed) {
+						Deleteshot(p);
+					}
+
+				}
+				else {//スライド移動中								 
+					  //第三段階以降はすべての赤ビームから残留する。
+					if ((ctrl.GetButton("left") % 13 == 0 || ctrl.GetButton("right") % 13 == 0) && shott[p].beamed == false && ctrl.GetButton("slow") > 240 && ctrl.GetButton("ok_shot") > 240 && ((int)(j.x - shot[p].x) % 16 == 0 || (int)(j.x - shot[p].x - 1) % 17 == 0) && shotcount < 494) {
+						int beam = tail;
+						double by = j.y - 60;
+						while (by > 15) {
+							shot[beam].x = j.x;
+							shot[beam].y = by;
+							shot[beam].vecx = shot[p].vecx;
+							shot[beam].vecy = shot[p].vecy;
+							shot[beam].imgp = shot[p].imgp;
+							shot[beam].imgangle = shot[p].imgangle;
+							shot[beam].imggapp = shot[p].imggapp;
+							shot[beam].power = shot[p].power;
+							shot[beam].flamebetween = shot[p].flamebetween;
+							shot[beam].pp = beam - 1;
+							shott[beam].beamed = true;
+							shot[beam].np = beam + 1;
+							beam++;
+							by -= 60;
+							shotcount++;
+						}
+						tail = beam;
+						Deleteshot(p);
+					}
+				}
+				preleft = ctrl.GetButton("left");
+				preright = ctrl.GetButton("right");
+				if (ctrl.GetButton("ok_shot") == 0) {
+					Deleteshot(p);
+				}
+
+			}
+			if (shot[p].imgp == shotdot[1][4] && j.powercount != 2 && shott[p].beamed) {
+				if (abs((int)(j.x - shot[p].x)) > 60) {
+					Deleteshot(p);
+				}
+			}
+			shot[p].x += shot[p].vecx;
+			shot[p].y += shot[p].vecy;
+			if (shot[p].x + shot[p].imggapp < 20 || shot[p].y + shot[p].imggapp < 0 || shot[p].x - shot[p].imggapp > 404 || shot[p].y - shot[p].imggapp > 465) {
+				//画面から完全にはみ出したら消去
+				Deleteshot(p);
+			}
+			else {
+				if (shot[p].imgp == shotdot[2][2]) {//低速時はX軸の移動方向が変わる。また貼り付け位置が特殊。
+					if (shott[p].slow) {
+						if (shott[p].changed == 15) {
+							shot[p].vecx *= -1;
+							shott[p].changed = 0;
+							if (shot[p].vecx > 0) {
+								shot[p].imgangle = 150;
+							}
+							else {
+								shot[p].imgangle = 390;
+							}
+						}
+						else {
+							shott[p].changed++;
+						}
+						shot[p].x += shot[p].vecx;
+						shot[p].y += shot[p].vecy;
+
+					}
+					if (j.slow == false) {
+						shott[p].slow = false;
+					}
+
+					if (DrawRotaGraph((int)(shot[p].x - shot[p].imggapp), (int)(shot[p].y), 1.0, (shot[p].imgangle - 90) * PI / 180, shot[p].imgp, true, 0) != 0) {
+						r = -1;
+					}
+				}
+				else {
+					if (shot[p].imgp == shotdot[2][1]) {//上記同様貼り付け位置が特殊なため。
+						if (DrawRotaGraph((int)(shot[p].x - shot[p].imggapp), (int)(shot[p].y), 1.0, (shot[p].imgangle) * PI / 180, shot[p].imgp, true, 0) != 0) {
+							r = -1;
+						}
+					}
+					else {
+						if (DrawRotaGraph((int)(shot[p].x - shot[p].imggapp), (int)(shot[p].y - shot[p].imggapp), 1.0, shot[p].imgangle * PI / 180, shot[p].imgp, true, 0) != 0) {
+							r = -1;
+						}
+					}
+				}
+			}
+			p = shot[p].np;
+		}
+		if (r == -1) {
+			r = -1;
+		}
+		return r;
+	}
+	
+	//指定されたショットデータを消去
+	void Jiki::Deleteshot(int p) {
+		shot[shot[p].pp].np = shot[p].np;
+		shot[shot[p].np].pp = shot[p].pp;
+		shotcount--;
+	}
+	
+	//ショットデータをリフレッシュし、空きデータをまとめる
+	void Jiki::ShotRefresh() {
+		double refdouble[SHOTLIMIT][8];
+		int refint[SHOTLIMIT][7];
+		bool refbool[SHOTLIMIT][6];
+		int p, pp, endf;
+		p = 1;
+		pp = shot[0].np;
+		while (pp != tail && p < SHOTLIMIT) {
+			refdouble[p][1] = shot[pp].x;
+			refdouble[p][2] = shot[pp].y;
+			refdouble[p][3] = shot[pp].vecx;
+			refdouble[p][4] = shot[pp].vecy;
+			refdouble[p][5] = shot[pp].power;
+			refdouble[p][6] = shott[pp].homingx;
+			refdouble[p][7] = shott[pp].homingy;
+			refint[p][1] = shot[pp].imgangle;
+			refint[p][2] = shot[pp].imgp;
+			refint[p][3] = shot[pp].imggapp;
+			refint[p][4] = shot[pp].flamebetween;
+			refint[p][5] = shott[pp].homingp;
+			refint[p][6] = shott[pp].changed;
+			refbool[p][1] = shott[pp].sethoming;
+			refbool[p][2] = shott[pp].slow;
+			refbool[p][3] = shott[pp].slowcancel;
+			refbool[p][4] = shott[pp].beamed;
+			refbool[p][5] = shott[pp].whichset;
+			p++;
+			pp = shot[pp].np;
+		}
+		ClearShot();
+		if (p != 1) {
+			shotcount = p - 1;
+			endf = 0;
+			tail = p;
+			pp = 1;
+		}
+		else {
+			endf = 100;
+			tail = 1;
+		}
+		while (endf == 0) {
+			shot[pp].x = refdouble[pp][1];
+			shot[pp].y = refdouble[pp][2];
+			shot[pp].vecx = refdouble[pp][3];
+			shot[pp].vecy = refdouble[pp][4];
+			shot[pp].power = refdouble[pp][5];
+			shott[pp].homingx = refdouble[pp][6];
+			shott[pp].homingy = refdouble[pp][7];
+			shot[pp].imgangle = refint[pp][1];
+			shot[pp].imgp = refint[pp][2];
+			shot[pp].imggapp = refint[pp][3];
+			shot[pp].flamebetween = refint[pp][4];
+			shott[pp].homingp = refint[pp][5];
+			shott[pp].changed = refint[pp][6];
+			shott[pp].sethoming = refbool[pp][1];
+			shott[pp].slow = refbool[pp][2];
+			shott[pp].slowcancel = refbool[pp][3];
+			shott[pp].beamed = refbool[pp][4];
+			shott[pp].whichset = refbool[pp][5];
+			shot[pp].pp = pp - 1;
+			shot[pp].np = pp + 1;
+			pp++;
+			if (pp == tail) { endf = 100; }
+		}
+	}
+	
+	//自機操作などの処理
 	int Jiki::ProcessJiki(int flame, bool talk){
 		int r = 0;
 		ctrl.GetCondition();
@@ -261,6 +561,17 @@ public:
 		}
 		if (ctrl.GetButton("ok_shot") > 0 && talk == false){
 			SetShot(flame);
+		}
+		if (ctrl.GetButton("cancel_bomb") > 0 && talk == false && j.bombcount > 0 && bombtime == -1) {
+			j.bombcount--;
+			int b = jikinum;
+			if (ctrl.GetButton("slow") > 0) {
+				b += 20;
+			}
+			else {
+				b += 10;
+			}
+			SetBomb(b);
 		}
 		if (jikinum == 3 && j.slow == false && slowkakudo != 75){
 			int migi = 0;
@@ -373,13 +684,26 @@ public:
 
 		return r;
 	}
+	
+	//選択された自機名を元にゲーム内の性能を設定
 	void Jiki::InputName(bool practice){
 		sakuyaopkakudo = 0;
 		slowkakudo = 0;
 		j.x = 212;
-		j.y = 410;
+		j.y = 425;
 		j.bombcount = 2;
 		j.extendcount = 2;
+		/*ここからデバッグ		
+		countscore[0] = 9;
+		countscore[1] = 8;
+		countscore[2] = 7;
+		countscore[3] = 0;
+		countscore[4] = 2;
+		countscore[5] = 3;
+		countscore[6] = 6;
+		countscore[7] = 2;
+		grazecount = 213;
+		//ここまでデバッグ*/
 		if (practice){
 			j.power = 128;
 			j.powercount = 5;
@@ -398,7 +722,7 @@ public:
 			jikinum = 0;
 		}
 		else{
-			j.hitr = 3;
+			j.hitr = 3;//3デバッグ
 		}
 		if (Data.partner == "Mima"){
 			j.vecx = 6.5;
@@ -425,286 +749,19 @@ public:
 		}
 
 	}
-	void Jiki::SetShot(int flame){
-		int shotkazu, shotsu, p, preshotcount;
-		shotsu = 0;
-		if (shotcount == 0 && tail == 0){
-			//一発目の弾幕はshot[0].npに配置
-			p = shot[0].np;
-		}
-		else{
-			//それ以外はtailに配置
-			p = tail;
-		}
-		if (p == 0){
-			p = 0;
-		}
-
-		if (j.slow && jikinum != 3){
-			jikinum += 4;
-		}
-		preshotcount = shotcount;
-		shotkazu = (int)(shotdata[jikinum][j.powercount][0].x);
-		if (shotcount + shotkazu > SHOTLIMIT){
-			ShotRefresh();
-		}
-		while (shotkazu != 0){
-			if (/*(*/flame % shotdata[jikinum][j.powercount][shotkazu].shotbetween == 0/* || (flame + 1) % shotdata[jikinum][j.powercount][shotkazu].shotbetween == 0)*/){
-				shot[p].imggapp = shotdata[jikinum][j.powercount][shotkazu].imggapp;
-				shot[p].imgp = shotdata[jikinum][j.powercount][shotkazu].imgp;
-				if (shot[p].imgp == shotdot[3][1] && (slowkakudo != 0 || sakuyaopkakudo != 0)){
-					double x, y;
-					x = shotdata[jikinum][j.powercount][shotkazu].x * cos(slowkakudo * PI / 180) - shotdata[jikinum][j.powercount][shotkazu].y * sin(slowkakudo * PI / 180);
-					y = shotdata[jikinum][j.powercount][shotkazu].x * sin(slowkakudo * PI / 180) + shotdata[jikinum][j.powercount][shotkazu].y * cos(slowkakudo * PI / 180);
-					if (shotdata[jikinum][j.powercount][shotkazu].x > 0){
-						shot[p].x = j.x + x * cos(sakuyaopkakudo * PI / 180) + y * sin(sakuyaopkakudo * PI / 180);
-						shot[p].y = j.y + x * sin(sakuyaopkakudo * PI / 180) - y * cos(sakuyaopkakudo * PI / 180);
-					}
-					else{
-						shot[p].x = j.x + x * cos(sakuyaopkakudo * PI / 180) - y * sin(sakuyaopkakudo * PI / 180);
-						if (sakuyaopkakudo < 0){
-							shot[p].y = j.y - y * sin(sakuyaopkakudo * PI / 180) - y * cos(sakuyaopkakudo * PI / 180);
-						}
-						else{
-							shot[p].y = j.y + y * sin(sakuyaopkakudo * PI / 180) + y * cos(sakuyaopkakudo * PI / 180);
-						}
-					}
-					if (sakuyaopkakudo != 0){
-						shot[p].vecy = shotdata[jikinum][j.powercount][shotkazu].vecx * sin(sakuyaopkakudo * PI / 180) * -1 + shotdata[jikinum][j.powercount][shotkazu].vecy * cos(sakuyaopkakudo * PI / 180);
-						shot[p].vecx = shotdata[jikinum][j.powercount][shotkazu].vecx * cos(sakuyaopkakudo * PI / 180) * -1 - shotdata[jikinum][j.powercount][shotkazu].vecy * sin(sakuyaopkakudo * PI / 180);
-						shot[p].imgangle = (int)(atan2(shot[p].vecx, shot[p].vecy * -1) * 180 / PI);
-					}
-					else{
-						shot[p].vecx = shotdata[jikinum][j.powercount][shotkazu].vecx;
-						shot[p].vecy = shotdata[jikinum][j.powercount][shotkazu].vecy;
-						shot[p].imgangle = shotdata[jikinum][j.powercount][shotkazu].imgangle;
-					}
-				}
-				else{
-					shot[p].x = j.x + shotdata[jikinum][j.powercount][shotkazu].x;
-					shot[p].y = j.y + shotdata[jikinum][j.powercount][shotkazu].y;
-					shot[p].vecx = shotdata[jikinum][j.powercount][shotkazu].vecx;
-					shot[p].vecy = shotdata[jikinum][j.powercount][shotkazu].vecy;
-					shot[p].imgangle = shotdata[jikinum][j.powercount][shotkazu].imgangle;
-				}
-				shot[p].flamebetween = shotdata[jikinum][j.powercount][shotkazu].flamebetween;
-				shot[p].power = shotdata[jikinum][j.powercount][shotkazu].power;
-				if (shot[p].imgp == shotdot[2][2] && j.slow && ((shotdata[jikinum][j.powercount][shotkazu].x > 0 && shotdata[jikinum][j.powercount][shotkazu].vecx < 0) || (shotdata[jikinum][j.powercount][shotkazu].x < 0 && shotdata[jikinum][j.powercount][shotkazu].vecx > 0))){
-					shott[p].changed = 0;
-					shott[p].slow = true;
-				}
-				shot[p].pp = p - 1;
-				shot[p].np = p + 1;
-				shotsu++;
-				shotcount++;
-				p++;
-			}
-			shotkazu--;
-		}
-		tail += shotsu;
-		AddScore(1);
-		if (jikinum > 3){
-			jikinum -= 4;
-		}
-
-	}
-	int Jiki::ProcessShot(int flame){
-		int p = shot[0].np;
-		int r = 0;
-		while (p != tail && r == 0 && shotcount > 0){
-			if (shot[p].imgp == shotdot[1][2]){
-				if (j.slow == false || ctrl.GetButton("ok_shot") == 0){ shott[p].slowcancel = true; }
-				if (shott[p].slowcancel == false){
-					shot[p].x = j.x;
-				}
-				/*
-				if (j.slow && ctrl.GetButton("slow") % 360 == 0){
-				ClearShot();
-				ctrl.SetButtonInit();
-				break;n
-				}*/
-			}
-
-
-			if (shot[p].imgp == shotdot[1][4] && j.slow && j.powercount > 2){//パワーカウントが第三段階以上でかつ低速移動中で影ビームの処理時
-				if (ctrl.GetButton("left") == 0 && ctrl.GetButton("right") == 0){
-					//スライド移動していない時は残留ビームは発生しない
-					if (shott[p].beamed){
-						Deleteshot(p);
-					}
-
-				}
-				else{//スライド移動中								 
-					//第三段階以降はすべての赤ビームから残留する。
-					if ((ctrl.GetButton("left") % 13 == 0 || ctrl.GetButton("right") % 13 == 0) && shott[p].beamed == false && ctrl.GetButton("slow") > 240 && ctrl.GetButton("ok_shot") > 240 && ((int)(j.x - shot[p].x) % 16 == 0 || (int)(j.x - shot[p].x - 1) % 17 == 0) && shotcount < 494){
-						int beam = tail;
-						double by = j.y - 60;
-						while (by > 15){
-							shot[beam].x = j.x;
-							shot[beam].y = by;
-							shot[beam].vecx = shot[p].vecx;
-							shot[beam].vecy = shot[p].vecy;
-							shot[beam].imgp = shot[p].imgp;
-							shot[beam].imgangle = shot[p].imgangle;
-							shot[beam].imggapp = shot[p].imggapp;
-							shot[beam].power = shot[p].power;
-							shot[beam].flamebetween = shot[p].flamebetween;
-							shot[beam].pp = beam - 1;
-							shott[beam].beamed = true;
-							shot[beam].np = beam + 1;
-							beam++;
-							by -= 60;
-							shotcount++;
-						}
-						tail = beam;
-						Deleteshot(p);
-					}
-				}
-				preleft = ctrl.GetButton("left");
-				preright = ctrl.GetButton("right");
-				if (ctrl.GetButton("ok_shot") == 0){
-					Deleteshot(p);
-				}
-
-			}
-			if (shot[p].imgp == shotdot[1][4] && j.powercount != 2 && shott[p].beamed){
-				if (abs((int)(j.x - shot[p].x)) > 60){
-					Deleteshot(p);
-				}
-			}
-			shot[p].x += shot[p].vecx;
-			shot[p].y += shot[p].vecy;
-			if (shot[p].x + shot[p].imggapp < 20 || shot[p].y + shot[p].imggapp < 0 || shot[p].x - shot[p].imggapp > 404 || shot[p].y - shot[p].imggapp > 465){
-				//画面から完全にはみ出したら消去
-				Deleteshot(p);
-			}
-			else{
-				if (shot[p].imgp == shotdot[2][2]){//低速時はX軸の移動方向が変わる。また貼り付け位置が特殊。
-					if (shott[p].slow){
-						if (shott[p].changed == 15){
-							shot[p].vecx *= -1;
-							shott[p].changed = 0;
-							if (shot[p].vecx > 0){
-								shot[p].imgangle = 150;
-							}
-							else{
-								shot[p].imgangle = 390;
-							}
-						}
-						else{
-							shott[p].changed++;
-						}
-						shot[p].x += shot[p].vecx;
-						shot[p].y += shot[p].vecy;
-
-					}
-					if (j.slow == false){
-						shott[p].slow = false;
-					}
-
-					if (DrawRotaGraph((int)(shot[p].x - shot[p].imggapp), (int)(shot[p].y), 1.0, (shot[p].imgangle - 90) * PI / 180, shot[p].imgp, true, 0) != 0){
-						r = -1;
-					}
-				}
-				else{
-					if (shot[p].imgp == shotdot[2][1]){//上記同様貼り付け位置が特殊なため。
-						if (DrawRotaGraph((int)(shot[p].x - shot[p].imggapp), (int)(shot[p].y), 1.0, (shot[p].imgangle) * PI / 180, shot[p].imgp, true, 0) != 0){
-							r = -1;
-						}
-					}
-					else{
-						if (DrawRotaGraph((int)(shot[p].x - shot[p].imggapp), (int)(shot[p].y - shot[p].imggapp), 1.0, shot[p].imgangle * PI / 180, shot[p].imgp, true, 0) != 0){
-							r = -1;
-						}
-					}
-				}
-			}
-			p = shot[p].np;
-		}
-		if (r == -1){
-			r = -1;
-		}
-		return r;
-	}
-	void Jiki::Deleteshot(int p){
-		shot[shot[p].pp].np = shot[p].np;
-		shot[shot[p].np].pp = shot[p].pp;
-		shotcount--;
-	}
-	void Jiki::ShotRefresh(){
-		double refdouble[SHOTLIMIT][8];
-		int refint[SHOTLIMIT][7];
-		bool refbool[SHOTLIMIT][6];
-		int p, pp, endf;
-		p = 1;
-		pp = shot[0].np;
-		while (pp != tail && p < SHOTLIMIT){
-			refdouble[p][1] = shot[pp].x;
-			refdouble[p][2] = shot[pp].y;
-			refdouble[p][3] = shot[pp].vecx;
-			refdouble[p][4] = shot[pp].vecy;
-			refdouble[p][5] = shot[pp].power;
-			refdouble[p][6] = shott[pp].homingx;
-			refdouble[p][7] = shott[pp].homingy;
-			refint[p][1] = shot[pp].imgangle;
-			refint[p][2] = shot[pp].imgp;
-			refint[p][3] = shot[pp].imggapp;
-			refint[p][4] = shot[pp].flamebetween;
-			refint[p][5] = shott[pp].homingp;
-			refint[p][6] = shott[pp].changed;
-			refbool[p][1] = shott[pp].sethoming;
-			refbool[p][2] = shott[pp].slow;
-			refbool[p][3] = shott[pp].slowcancel;
-			refbool[p][4] = shott[pp].beamed;
-			refbool[p][5] = shott[pp].whichset;
-			p++;
-			pp = shot[pp].np;
-		}
-		ClearShot();
-		if (p != 1){
-			shotcount = p - 1;
-			endf = 0;
-			tail = p;
-			pp = 1;
-		}
-		else{
-			endf = 100;
-			tail = 1;
-		}
-		while (endf == 0){
-			shot[pp].x = refdouble[pp][1];
-			shot[pp].y = refdouble[pp][2];
-			shot[pp].vecx = refdouble[pp][3];
-			shot[pp].vecy = refdouble[pp][4];
-			shot[pp].power = refdouble[pp][5];
-			shott[pp].homingx = refdouble[pp][6];
-			shott[pp].homingy = refdouble[pp][7];
-			shot[pp].imgangle = refint[pp][1];
-			shot[pp].imgp = refint[pp][2];
-			shot[pp].imggapp = refint[pp][3];
-			shot[pp].flamebetween = refint[pp][4];
-			shott[pp].homingp = refint[pp][5];
-			shott[pp].changed = refint[pp][6];
-			shott[pp].sethoming = refbool[pp][1];
-			shott[pp].slow = refbool[pp][2];
-			shott[pp].slowcancel = refbool[pp][3];
-			shott[pp].beamed = refbool[pp][4];
-			shott[pp].whichset = refbool[pp][5];
-			shot[pp].pp = pp - 1;
-			shot[pp].np = pp + 1;
-			pp++;
-			if (pp == tail){ endf = 100; }
-		}
-	}
+	
+	//スコア・カスリ数などを初期化
 	void Jiki::ClearStates(){
 		int p;
 		for (p = 0; p < 10; p++){
 			totalscore[p] = 0;
 		}
 		totalgraze = 0;
-		ClearCount();
+		//ClearCount();
 		LoadStates();
 	}
+	
+	//カスリ数を初期化
 	void ClearCount(){
 		int p;
 		for (p = 0; p < 10; p++){
@@ -712,6 +769,8 @@ public:
 		}
 		grazecount = 0;
 	}
+	
+	//ストーリーモードにおいてスコアとグレーズ数を引き継ぐとともに初期化します。
 	void NextStage(){//ストーリーモードにおいてスコアとグレーズ数を引き継ぐとともに初期化します。
 		for (int s = 0; s < 10; s++){
 			totalscore[s] += countscore[s];
@@ -723,6 +782,8 @@ public:
 		//totalgraze += grazecount;
 		ClearCount();
 	}
+	
+	//画面右側にスコア・残機数・ボム残り・カスリ数等を表示
 	int Jiki::DisplayStates(int ten){
 		int r = 0;
 		SetDrawArea(1, 1, 639, 479);
@@ -806,6 +867,8 @@ public:
 		}
 		return r;
 	}
+	
+	//ステージクリアの表示とともにステージ中で獲得したステータスを表示
 	void Jiki::DisplayStageResult(int ClearBonus, int GrazeBonus){//ステージ中に稼いだスコアとグレーズを表示します。
 		int StageClearFont = CreateFontToHandle(NULL, 36, 5, DX_FONTTYPE_EDGE);
 		DrawStringToHandle(80, 40, "Stage Clear!!", GetColor(255, 100, 100), StageClearFont, GetColor(100, 100, 100), false);
@@ -822,6 +885,8 @@ public:
 		DrawFormatString(60, 200, GetColor(255, 255, 255), "Total               = %10d", stagescore);
 		DeleteFontToHandle(StageClearFont);
 	}
+	
+	//DisplayStatesに必要な画像データを読み込み
 	void Jiki::LoadStates(){
 		int r;
 		r = _chdir("data");
@@ -848,6 +913,8 @@ public:
 		r = _chdir("..");
 
 	}
+	
+	//スコアを加算
 	void Jiki::AddScore(int score){
 		int p, s, d;
 		int keepgraze = grazecount;
@@ -872,12 +939,15 @@ public:
 		}
 		grazecount = keepgraze;
 	}
+	
+	//カスリを加算
 	void Jiki::AddGraze(int graze){
 		if (graze > 0){
 			grazecount += graze;
 		}
 	}
-
+	
+	//総合的なゲーム内処理
 	int Jiki::ProcessGame(int flamecount){
 		int r = 0;
 		int cr;
@@ -917,7 +987,7 @@ public:
 					}
 				}
 				else{
-					cr = 100;
+					cr = 8;
 				}
 			}
 			break;
@@ -944,7 +1014,7 @@ public:
 					}
 				}
 				else{
-					cr = 100;
+					cr = 8;
 				}
 			}
 			break;
@@ -972,7 +1042,7 @@ public:
 					}
 				}
 				else{
-					cr = 100;
+					cr = 8;
 				}
 			}
 			break;
@@ -990,7 +1060,7 @@ public:
 			if (s4.scene == 16 && s4.Currenttime < 4){//BGM名を下段に表示
 				ongaku.DisplayMusicName(8, s4.Currenttime * 60 + flamecount);
 			}
-			if (s4.scene == 21 && s4.Currenttime < 4){//BGM名を下段に表示
+			if (s4.scene == 23 && s4.Currenttime < 4){//BGM名を下段に表示
 				if (s4.lastbuttle == 1){
 					ongaku.DisplayMusicName(9, s4.Currenttime * 60 + flamecount);
 				}
@@ -1013,7 +1083,7 @@ public:
 					}
 				}
 				else{
-					cr = 100;
+					cr = 8;
 				}
 			}
 			break;
@@ -1058,10 +1128,10 @@ public:
 		stage->j.ok_shot = ctrl.GetButton("ok_shot");
 		stage->j.x = j.x;
 		stage->j.y = j.y;
-
+		
 		SetDrawArea(20, 15, 404, 465);
 		if (stage->s != -1 && stage->scene != 0){
-			if (stage->Miss){
+			if (stage->missflame < 121){
 				int rr = MissEffect(stage);
 				if (rr != 0){//エラーまたはゲームオーバーなら返り値を変更
 					r = rr;
@@ -1071,6 +1141,9 @@ public:
 				if (stage->BossTalk == false){
 					if (ProcessJiki(flamecount + stage->s * 60, false) != 0){
 						r = -1;
+					}
+					if (bombtime > -1) {
+						ProcessBomb();
 					}
 				}
 				else{
@@ -1159,9 +1232,11 @@ public:
 								break;
 							case 1:
 								RequestBGM = ongaku.MusicList.Boss41;
+								
 								break;
 							case 2:
 								RequestBGM = ongaku.MusicList.Boss42;
+								
 								break;
 							}
 							break;
@@ -1180,7 +1255,10 @@ public:
 								r = -1;
 							}
 							else{
-								stage->Talkcount = 100;
+								if (stage != &s1 && stage != &s2 && stage != &s3) {
+									stage->Talkcount = 100; 
+								}
+								
 							}
 						}
 					}
@@ -1189,7 +1267,9 @@ public:
 					}
 				}
 			}
-			
+			if (stage->missflame < 300) {//ミスしてから5秒間は無敵時間となる
+				stage->missflame++;
+			}
 			if (stage->itemcount > 0){
 				SetDrawArea(20, 15, 404, 465);
 				if (ProcessItem(flamecount + (stage->Begintime + stage->Currenttime) * 60, stage) != 0 && r == 0){
@@ -1213,7 +1293,9 @@ public:
 		if (stage->Bossbuttle == false){//ボスと戦闘中でない時
 			if (stage->Endtime - stage->Begintime < stage->Currenttime && r != 0){
 				if (stage->scene == 0){
-					stage->scene = 1;//デバッグ用
+					stage->scene = 19;//デバッグ用
+					//stage->Nextscene(15, 128);
+					//stage->Nextscene(23, 128);//ボス戦中のデバッグはボス戦仕様に設定した上でデバッグする。
 				}
 				else{
 					stage->scene++;
@@ -1229,14 +1311,30 @@ public:
 				}
 			}
 			HitJudgement(flamecount + (stage->Begintime + stage->Currenttime) * 60, stage);
-			if (stage->Miss == false && ((stage->tekicount > 0 && MissJudgement(stage) == true) || (danmaku->dancount > 0 && MissJudgement(danmaku) == true))){
-				//被弾時の対応
-				/*stage->Miss = true;
-				danmaku->ClearDanmaku();
-				ClearShot();
-				j.extendcount--;
-				j.bombcount = 2;
-				stage->missflame = 0;*/
+			if (bombtime > -1) {
+				
+				switch (bomb[0].power) {
+				case 10:
+					BombHoming(stage, 400);
+					break;
+				case 13:
+					BombHoming(stage, 100);
+					break;
+				}
+				BombHitJudgement(flamecount + (stage->Begintime + stage->Currenttime) * 60, stage);
+				BombHitDanmaku(flamecount + (stage->Begintime + stage->Currenttime) * 60, danmaku);
+			}
+			else {
+				if (stage->missflame > 299 && ((stage->tekicount > 0 && MissJudgement(stage) == true) || (danmaku->dancount > 0 && MissJudgement(danmaku, stage->missflame) == true))) {
+					//被弾時の対応
+					stage->Miss = true;
+					danmaku->ClearDanmaku();
+					ClearShot();
+					j.extendcount--;
+					j.bombcount = 2;
+					stage->missflame = 0;
+					stage->eff.RequestSE(stage->eff.se.miss);
+				}
 			}
 			if (stage->eff.ecount > 0){
 				stage->eff.ProcessEffect();
@@ -1290,6 +1388,7 @@ public:
 					}
 					break;
 				case 4:
+					RefreshStop = true;
 					if (s4.rinbuttle){
 						boss = &s4.Rin;
 						s4.ProcessRin(flamecount);
@@ -1298,6 +1397,7 @@ public:
 						switch (s4.lastbuttle){
 						case 0://前半戦
 							doublebuttle = true;
+							boss = &s4.yonboss;
 							s4.Process4Boss(flamecount);
 							break;
 						case 1://明子戦
@@ -1319,6 +1419,9 @@ public:
 				case 7:
 					break;
 				}
+				if (bombtime > -1) {
+					BombHitDanmaku(flamecount + (stage->Begintime + stage->Currenttime) * 60, danmaku);
+				}
 				if (doublebuttle == false){
 
 					if (jikinum == 0 && stage->Bosshit){
@@ -1326,11 +1429,39 @@ public:
 					}
 					if (stage->Bosshit){
 						BossHitJudgement(boss, flamecount);
+						if(bombtime > 0){
+							BossBombHitJudgement(boss, 0, flamecount);
+							switch (bomb[0].power) {
+							case 10:
+								BombHoming(boss->x, boss->y, 0, 0, 400);
+								break;
+							case 13:
+								BombHoming(boss->x, boss->y, 0, 0, 50);
+								break;
+							}
+						}
 					}
 					if ((stage->BossTalk && stage->Talkcount == 0) || ((stage->Maxhitpoint != 0 && boss->hitpoint < 1) || stage->Bosstime == 0)){
 						stage->scene++;
 					}
+					if (bombtime == -1)  {
+						if (stage->missflame > 299 && (MissJudgement(danmaku, stage->missflame) == true || BossMissJudgement(boss->x, boss->y, boss->hitr, stage) == true)) {
 
+							//被弾時の対応
+							if (debuging == false) {
+								stage->Miss = true;
+								boss->hitpoint = (int)(boss->hitpoint * 0.75);
+								//stage->Maxhitpoint = (int)(stage->Maxhitpoint * 0.75);
+								danmaku->ClearDanmaku();
+								ClearShot();
+								j.extendcount--;
+								j.bombcount = 2;
+								stage->missflame = 0;
+								stage->SpellBonusScore = 0;
+								stage->eff.RequestSE(stage->eff.se.miss);
+							}
+						}
+					}
 				}
 				else{
 					//明子＆みどり戦　なお皆見＆炬戦は炬を使い魔として扱うものとする。
@@ -1344,46 +1475,76 @@ public:
 					totalhp = s4.yonboss.hitpoint;
 					if (stage->Bosshit){
 						BossHitJudgement(&s4.yonboss,&s4.akiko, flamecount);
-						akikohp -= (totalhp - s4.yonboss.hitpoint);
+						if (bombtime > 0) {
+							BossBombHitJudgement(&s4.akiko,&s4.yonboss,flamecount);
+						}
+						akikohp -= (totalhp - s4.yonboss.hitpoint);						
 						totalhp = s4.yonboss.hitpoint;
 						BossHitJudgement(&s4.yonboss,&s4.midori, flamecount);
+						if (bombtime > 0) {
+							BossBombHitJudgement(&s4.midori, &s4.yonboss, flamecount);
+						}
 						midorihp -= (totalhp - s4.yonboss.hitpoint);
 					}
 					//明子＆みどり戦はいずれも体力は共有。後半戦は直前にショットが当たっていないボスと戦う事になる。
 					//撃沈の判定は（二人の体力合計）< 初期一人分の体力 で共倒れの場合はみどりが残る。
-					if ((stage->BossTalk && stage->Talkcount == 0) || ((stage->Maxhitpoint != 0 && s4.yonboss.hitpoint < 1) || stage->Bosstime == 0)){
+					if ((stage->BossTalk && stage->Talkcount == 0) || ((stage->Maxhitpoint != 0 && boss->hitpoint < 1) || stage->Bosstime == 0)){
 						stage->scene++;
 						if (stage->scene == 21){
 							if (akikohp > midorihp){
 								s4.lastbuttle = 1;
+								s4.danmaku.lastbuttle = true;
 							}
 							else{
 								s4.lastbuttle = 2;
+								s4.danmaku.lastbuttle = false;
+							}
+						}
+					}
+					boss = &s4.akiko;
+					Stage::BOSU * boss2 = &s4.midori;
+					if (bombtime > -1) {
+						stage->SpellBonusScore = 0;
+						switch (bomb[0].power) {
+						case 10:
+							BombHoming(boss->x, boss->y, boss2->x, boss2->y, 400);
+							break;
+						case 13:
+							BombHoming(boss->x, boss->y, boss2->x, boss2->y, 50);
+							break;
+						}
+					}
+					else {
+												
+						if (stage->missflame > 299 && (MissJudgement(danmaku, stage->missflame) == true || BossMissJudgement(boss->x, boss->y, boss->hitr, stage) == true || BossMissJudgement(boss2->x, boss2->y, boss2->hitr, stage) == true)) {
+
+							//被弾時の対応
+							if (debuging == false) {
+								stage->Miss = true;
+								boss->hitpoint = (int)(boss->hitpoint * 0.75);
+								//stage->Maxhitpoint = (int)(stage->Maxhitpoint * 0.75);
+								danmaku->ClearDanmaku();
+								ClearShot();
+								j.extendcount--;
+								j.bombcount = 2;
+								stage->missflame = 0;
+								stage->SpellBonusScore = 0;
+								stage->eff.RequestSE(stage->eff.se.miss);
 							}
 						}
 					}
 				}
 				
-				if (stage->Miss == false && (MissJudgement(danmaku) == true || BossMissJudgement(boss->x, boss->y, boss->hitr, stage) == true)){
-					//被弾時の対応
-					if (debuging == false) {
-						stage->Miss = true;
-						boss->hitpoint = (int)(boss->hitpoint * 0.75);
-						stage->Maxhitpoint = (int)(stage->Maxhitpoint * 0.75);
-						danmaku->ClearDanmaku();
-						ClearShot();
-						j.extendcount--;
-						j.bombcount = 2;
-						stage->missflame = 0;
-						stage->SpellBonusScore = 0;
-					}
-				}
 				if (flamecount % 30 == 0 && RefreshStop == false){
 					danmaku->DanmakuRefresh();
 				}
 			}
 		}
 		SetDrawArea(1, 1, 639, 479);
+		//デバッグ出力
+		{
+			//DrawFormatString(500, 400, GetColor(255, 255, 255), "dancount   %d", s4.danmaku.dancount);
+		}
 		if (stage->prescene != stage->scene){
 			stage->s = 0;
 			if (stage->Nextscene(stage->scene, j.powercount) == -1){
@@ -1405,14 +1566,21 @@ public:
 		case 100:
 			r = 100;
 			break;
+		case -1:
+			r = -1;
+			break;
 		}
 
 		return r;
 	}
+	
+	//リプレイ再生処理
 	int Jiki::ProcessReplay(int flamecount){
 		int r = 0;
 		return r;
 	}
+	
+	//コンティニュー処理
 	void Jiki::SetContinue(){
 		j.extendcount = 2;
 		j.bombcount = 2;
@@ -1422,23 +1590,33 @@ public:
 		j.y = 410;
 		continuecount++;
 	}
+	
+	//選択された自機名を先んじて登録
 	void Jiki::Set_partner(char* name){
 		Data.partner = name;
 	}
+	
+	//難易度を登録
 	void Jiki::Set_difficulty(int dif){//難易度を設定します。Easy = 1,Normal = 2, Hard = 3, Lunatic = 4, Extra = 5とします。
 		Data.difficulty = dif;
 		Data.currentstage = 1;
 	}
+	
+	//Practice Modeにおける選択ステージを登録
 	void Jiki::Set_choicestage(int cs){
 		Data.choicestage = cs;
 		Data.currentstage = 0;
 	}
+	
+	//全自機データを初期化
 	void Jiki::ClearData(){
 		Data.partner = "";
 		Data.difficulty = 0;
 		Data.choicestage = 0;
 		Data.currentstage = 0;
 	}
+
+	//ゲーム開始と同時に必要な処理を全て実行(InputName,LoadShot等)
 	int  Jiki::StageStart(int choice){
 		int r = 0;
 		bool practice;
@@ -1452,9 +1630,12 @@ public:
 		if (jikinum == 0){
 
 		}
-		InputName(practice);
 		ClearShot();
-		LoadShot();
+		
+		InputName(practice);
+		LoadShot();		
+		LoadBomb();
+		ClearBomb();
 		Stage * stage;
 		switch (choice){
 		case 1://Stage1
@@ -1507,8 +1688,11 @@ public:
 		for (int j = 0; j < 16; j++){
 			stage->jstand[j] = jikistand[jikinum][j];
 		}
+
 		return r;
 	}
+	
+	//敵から出現したアイテムのfps処理
 	int Jiki::ProcessItem(int flame, Stage * stage){
 		int r = 0;
 		int time, p;
@@ -1680,6 +1864,8 @@ public:
 		}
 		return r;
 	}
+	
+	//アイテム回収処理
 	void Jiki::CorrectItem(int p, Stage * stage,int flame){
 		switch (stage->item[p].itemshu){
 		case 1://パワーアイテム
@@ -1750,6 +1936,8 @@ public:
 		}
 		stage->DeleteItem(p);
 	}
+	
+	//ホーミングショットの追跡判定
 	void Jiki::CheckHoming(Stage *stage){//ホーミング弾に対する処理の必要性を判断し、正ならその処理をします。
 		int searchr = 0;
 		int p = stage->teki[0].np;
@@ -1804,6 +1992,8 @@ public:
 			shotp = shot[shotp].np;
 		}
 	}
+
+	//ホーミングショットの追跡解除
 	void Jiki::CheckOffHoming(){//ホーミング弾のホーミング状態を解除します。
 		int p = shot[0].np;
 		while (p != tail && shotcount > 0){
@@ -1814,6 +2004,8 @@ public:
 			p = shot[p].np;
 		}
 	}
+
+	//ホーミングショットのボス追跡判定
 	void Jiki::BossCheckHoming(int bossx, int bossy){
 		int shotendf;
 		double searchr;
@@ -1848,6 +2040,8 @@ public:
 			if (shotp == tail || shotcount == 0){ shotendf = 100; }
 		}
 	}
+
+	//ホーミングショットの複数ボス追跡判定
 	void Jiki::BossCheckHoming(int bx1, int by1, int bx2, int by2){
 		int shotendf;
 		double searchr;
@@ -1891,6 +2085,8 @@ public:
 			if (shotp == tail || shotcount == 0){ shotendf = 100; }
 		}
 	}
+
+	//ザコ敵相手の当たり判定
 	void Jiki::HitJudgement(int flame, Stage *stage){
 		//自機のショットが敵に当たるかどうかを判断する関数です。ショットが当たると敵のHPを減らし、0になれば撃沈の処理をします。また当たればtrueを返して終了します。
 		int p = stage->teki[0].np;
@@ -2164,6 +2360,289 @@ public:
 			p = stage->teki[p].np;
 		}
 	}
+	
+	//ザコ敵相手のボム当たり判定
+	void Jiki::BombHitJudgement(int flame, Stage *stage) {
+		int p = stage->teki[0].np;
+		if (stage->tekicount == 0) {
+			p = stage->tail;
+		}
+		int judger;
+		int bp;
+		bool hit;//ボムが敵にヒットしたかどうかを示す変数です。ボムごとに異なる判定方法で判断します。
+		while (p != stage->tail && p < 200) {
+			if (stage->teki[p].tekishu < 5) {
+				//青～緑妖精
+				judger = 10;
+			}
+			else {
+				if (stage->teki[p].tekishu == 5) {
+					//ひまわり妖精
+					judger = 24;
+				}
+				else {
+					//綿毛
+					judger = 10;
+				}
+			}
+			bp = bomb[0].np;
+			int x, y;
+			while (bp != bomb[0].pp  && stage->teki[p].ready == 0) {
+				hit = false;
+				switch (bomb[0].power) {
+				case 10://道符「三元五徳八会の気」
+				{
+					GetGraphSize(bomb[bp].imgp, &x, &y);
+					if (x > y) {
+						x = y;
+					}
+					if (pow((bomb[bp].x  + x * 0.5 - stage->teki[p].x), 2.0) + pow((bomb[bp].y + x * 0.5 - stage->teki[p].y), 2.0) < pow(x + 10,2.0)) {
+						hit = true;
+					}
+				}
+				break;
+				case 11://妖霊「幽幻乱舞」
+				{
+					hit = true; 
+				}
+				break;
+				case 12://奇跡「ミラクルフルーツ」
+				{
+					if (pow((bomb[bp].x + 20 - stage->teki[p].x), 2.0) + pow((bomb[bp].y + 20 - stage->teki[p].y), 2.0) < pow(50, 2.0)) {
+						hit = true;
+					}
+				}
+				break;
+				case 13://幻符「殺人ドール」
+				{
+					if (pow((bomb[bp].x + 15 - stage->teki[p].x), 2.0) + pow((bomb[bp].y + 15 - stage->teki[p].y), 2.0) < pow(37, 2.0)) {
+						hit = true;
+					}
+				}
+				break;
+				case 20://天符「天の磐舟よ天へ昇れ」
+				{}
+				break;
+				case 21://魔光「トワイライトスパーク」
+				{}
+				break;
+				case 22://秘術「グレイソーマタージ」
+				{}
+				break;
+				case 23://時符「プライベートスクウェア」
+				{}
+				break;
+				}
+				if (hit && stage->teki[p].hitpoint > 0) {
+					//ボムが命中
+					stage->teki[p].hitpoint -= bomb[bp].power;
+					if (stage->teki[p].hitpoint < 1 && stage->teki[p].hitpoint != -100) {
+						//敵撃墜
+						stage->teki[p].hitpoint = -100;
+						s1.eff.RequestSE(s1.eff.se.enemyend);
+						stage->SetItem(stage->teki[p].x, stage->teki[p].y, flame, stage->teki[p].poweritem, stage->teki[p].tenitem);
+						if (stage->tteki[p].counter) {
+							stage->teki[p].hitpoint = 0.01;
+						}
+						else {
+							stage->DeleteEnemy(p);
+						}
+					}
+					if ((bomb[bp].imgp == bimg.go || bomb[bp].imgp == bimg.knife1 || bomb[bp].imgp == bimg.knife2)) {
+						DeleteBomb(bp);
+					}
+				}
+				bp = bomb[bp].np;
+			}
+			p = stage->teki[p].np;
+		}
+	}
+
+	//ボス相手のボム当たり判定
+	void Jiki::BossBombHitJudgement(Stage::BOSU * boss,Stage::BOSU * total,int flame) {
+		int bp;
+		bool hit;//ボムが敵にヒットしたかどうかを示す変数です。ボムごとに異なる判定方法で判断します。
+		bp = bomb[0].np;
+		int x, y,totaldamage;
+		totaldamage = 0;
+		while (bp != bomb[0].pp) {
+			hit = false;
+			switch (bomb[0].power) {
+			case 10://道符「三元五徳八会の気」
+			{
+				GetGraphSize(bomb[bp].imgp, &x, &y);
+				if (x > y) {
+					x = y;
+				}
+				if (pow((bomb[bp].x + x * 0.5 - boss->x), 2.0) + pow((bomb[bp].y + x * 0.5 - boss->y), 2.0) < pow(x + boss->hitr, 2.0)) {
+					hit = true;
+				}
+			}
+			break;
+			case 11://妖霊「幽幻乱舞」
+			{
+				hit = true;
+			}
+			break;
+			case 12://奇跡「ミラクルフルーツ」
+			{
+				if (pow((bomb[bp].x + 20 - boss->x), 2.0) + pow((bomb[bp].y + 20 - boss->y), 2.0) < pow(50, 2.0)) {
+					hit = true;
+				}
+			}
+			break;
+			case 13://幻符「殺人ドール」
+			{
+				if (pow((bomb[bp].x + 15 - boss->x), 2.0) + pow((bomb[bp].y + 15 - boss->y), 2.0) < pow(37, 2.0)) {
+					hit = true;
+				}
+			}
+			break;
+			case 20://天符「天の磐舟よ天へ昇れ」
+			{}
+			break;
+			case 21://魔光「トワイライトスパーク」
+			{}
+			break;
+			case 22://秘術「グレイソーマタージ」
+			{}
+			break;
+			case 23://時符「プライベートスクウェア」
+			{}
+			break;
+			}
+			if (hit) {
+				//ボムが命中
+				if (total == 0) {
+					double deff = 1;
+					switch (bomb[0].power) {
+					case 10:
+						deff = 75;
+						break;
+					case 11:
+						deff = 2;
+						break;
+					case 12:
+						deff = 50;
+						break;
+					case 13:
+						deff = 0.75;
+						break;
+					}
+					boss->hitpoint -= bomb[bp].power / deff;
+				}
+				else {
+					totaldamage += bomb[bp].power;
+				}
+				if ((bomb[bp].imgp == bimg.go || bomb[bp].imgp == bimg.knife1 || bomb[bp].imgp == bimg.knife2)) {
+					DeleteBomb(bp);
+				}
+			}
+			bp = bomb[bp].np;
+		}
+		if (total != 0) {
+			int deff;
+			switch (bomb[0].power) {
+			case 10:
+				deff = 100;
+				break;
+			case 11:
+				if (bombtime % 8 == 0) {
+					deff = 2;
+				}
+				else {
+					deff = 5;
+				}
+				break;
+			case 12:
+				deff = 75;
+				break;
+			case 13: 
+				deff = 1;
+				break;
+
+			}
+			total->hitpoint -= totaldamage / deff;
+		}
+	}
+	
+	//ボムによる弾幕消去(一部例外有り)
+	void Jiki::BombHitDanmaku(int flame, Danmaku *d) {
+		int p;
+		if (d->dancount == 0) {
+			p = d->tail;
+		}
+		int bp = bomb[0].np;
+		bool hit;//ボムが敵にヒットしたかどうかを示す変数です。ボムごとに異なる判定方法で判断します。
+		while (bp != bomb[0].pp) {
+			p = d->dan[0].np;
+			int x, y;
+			while (p != d->tail  && d->ddan[p].ready == 0) {
+				hit = false;
+				switch (bomb[0].power) {
+				case 10://道符「三元五徳八会の気」
+				{
+					GetGraphSize(bomb[bp].imgp, &x, &y);
+					if (x > y) {
+						x = y;
+					}
+					if (pow((bomb[bp].x + x * 0.5 - d->dan[p].x), 2.0) + pow((bomb[bp].y + x * 0.5 - d->dan[p].y), 2.0) < pow(x + 10, 2.0)) {
+						hit = true;
+					}
+				}
+				break;
+				case 11://妖霊「幽幻乱舞」
+				{
+					if (bombtime > 120) {
+						hit = true;
+					}
+					else{
+						if (bombtime % 5 == 0) {
+							hit = true;
+						}
+					}
+				}
+				break;
+				case 12://奇跡「ミラクルフルーツ」
+				{
+					if (pow((bomb[bp].x + 20 - d->dan[p].x), 2.0) + pow((bomb[bp].y + 20 - d->dan[p].y), 2.0) < pow(50, 2.0)) {
+						hit = true;
+					}
+
+				}
+				break;
+				case 13://幻符「殺人ドール」
+				{
+					if (pow((bomb[bp].x + 15 - d->dan[p].x), 2.0) + pow((bomb[bp].y + 15 - d->dan[p].y), 2.0) < pow(37, 2.0)) {
+						hit = true;
+					}
+				}
+				break;
+				case 20://天符「天の磐舟よ天へ昇れ」
+				{}
+				break;
+				case 21://魔光「トワイライトスパーク」
+				{}
+				break;
+				case 22://秘術「グレイソーマタージ」
+				{}
+				break;
+				case 23://時符「プライベートスクウェア」
+				{}
+				break;
+				}
+				if (hit) {
+					//ボムが命中
+					//なおハードモードで炬戦かつ通常3以降でのKey弾はボムで消去されないものとする。
+					d->DeleteDan(p);
+				}
+				p = d->dan[p].np;
+			}
+			bp = bomb[bp].np;
+		}
+	}
+
+	//ボス相手の当たり判定
 	void Jiki::BossHitJudgement(Stage::BOSU * boss,int flame){
 		//ボスの当たり判定を行い、当たったショットのダメージの合計を返り値として返します。
 		int shotp = shot[0].np;
@@ -2400,6 +2879,8 @@ public:
 		
 		boss->hitpoint -= totaldamage;
 	};
+	
+	//複数ボス相手の当たり判定
 	void Jiki::BossHitJudgement(Stage::BOSU * total, Stage::BOSU * boss, int flame){
 		int shotp = shot[0].np;
 		double totaldamage = 0;
@@ -2635,6 +3116,8 @@ public:
 
 		total->hitpoint -= (int)(totaldamage);
 	}
+	
+	//カスリ判定
 	int GrazeJudgement(Danmaku * d){//カスリ判定を行い、カスリ数を返り値として返します。
 		int gcount = 0;
 		int p = d->dan[0].np;
@@ -2672,6 +3155,8 @@ public:
 		}
 		return gcount;
 	}
+	
+	//ザコ敵相手のミス判定
 	bool Jiki::MissJudgement(Stage * stage){
 		//敵位置における当たり判定を行います。falseの時はセーフ,trueの時はミスになります。
 		int p = stage->teki[0].np;
@@ -2695,38 +3180,49 @@ public:
 		}
 		return false;
 	}
-	bool MissJudgement(Danmaku * d){
+	
+	//弾幕相手のミス判定
+	bool MissJudgement(Danmaku * d, int missflame){
 		//自機に対するあたり判定を行います。falseの時はセーフで、trueが返されたらミスとなります。
 		int p = d->dan[0].np;
 		double judge = 0;
+		
 		while (p != d->tail && d->dancount > 0){
 			//Y =√{r² - (X - a)²} + b
 			if (d->dan[p].danshu == 15 || d->dan[p].danshu == 16){
 				//レーザー弾幕の判定
-				int wide, height;//wideは横幅、heightは縦幅
-				GetGraphSize(d->danimg[d->dan[p].danshu][d->dan[p].color], &wide, &height);
-				wide /= 2;
-				double area[13][3],fifx,fify;
+				/*
+				1.最初にレーザー画像の中心と自機位置との距離と角度を求める。
+				2.次にレーザーと自機位置との角度にレーザーの傾きの角度を減算し、レーザーが水平だった場合の仮の自機位置を求める。
+				*/
+				int jtol = (int)(sqrt(pow(d->dan[p].x - j.x, 2.0) + pow(d->dan[p].y - j.y, 2.0)));
+				double jtolvec = atan2(d->dan[p].y - j.y, d->dan[p].x - j.x);
+				double vx = cos((jtolvec - d->dan[p].imgangle)) * jtol + d->dan[p].x;
+				double vy = sin((jtolvec - d->dan[p].imgangle)) * jtol + d->dan[p].y;
+				int wide, height;//wideが横,heightが横
+				int  ltop, lleft;//画像の左上の座標(lleft,ltop)
+				switch(d->dan[p].danshu ) {
+				case 15:
+					wide = 100;
+					height = 8;					
+					break;
+				case 16:
+					wide = 204;
+					height = 11;
+					break;
+				}
+				lleft = (int)(d->dan[p].x - wide / 2);
+				ltop = (int)(d->dan[p].y - height / 2);
 				
-				area[1][1] = sqrt(pow(height, 2.0)) * cos(d->dan[p].imgangle) + d->dan[p].x;
-				area[1][2] = sqrt(pow(height, 2.0)) * sin(d->dan[p].imgangle)  + d->dan[p].y;
-				area[10][1] = sqrt(pow(height, 2.0) + pow(wide, 2.0)) * cos(d->dan[p].imgangle)+ d->dan[p].x;
-				area[10][2] = sqrt(pow(height, 2.0) + pow(wide, 2.0)) * sin(d->dan[p].imgangle) + d->dan[p].y;
-				fifx = (area[10][1] - area[1][1]) / 10;
-				fify = (area[10][2] - area[1][2]) / 10;
-				for (int f = 2; f < 10; f++){
-					area[f][1] = fifx * f + area[1][1];
-					area[f][2] = fify * f + area[1][2];
-				}
-				for (int f = 1; f < 11; f++){
-					area[f][1] -= fifx * 5;
-					area[f][2] -= fify * 5;
-				}
-				for (int f = 1; f < 11; f++){
-					double r = pow(area[f][1] - j.x, 2.0) + pow(area[f][2] - j.y, 2.0);
-					if (r < pow(j.hitr + height / 2 ,2.0)){
+				if (lleft < vx && ltop < vy && lleft + wide > vx && ltop + height > vy ) {
+					if (missflame == 300) {
+						//DrawString(500,450,"Miss",GetColor(255,255,255));
+						
+						d->ClearDanmaku();
 						return true;
-						DrawString(450, 100, "Miss!!", GetColor(255, 255, 255), 0);
+					}
+					else {
+						d->DeleteDan(p);
 					}
 				}
 			}
@@ -2734,8 +3230,14 @@ public:
 				//その他の弾幕の判定
 				judge = sqrt(pow((int)(d->dan[p].x) - j.x, 2.0) + pow((int)(d->dan[p].y) - j.y, 2.0));
 				if (judge < j.hitr + d->danhit[d->dan[p].danshu]){
-					d->ClearDanmaku();
-					return true;
+					if (missflame == 300) {
+						d->ClearDanmaku();
+						return true;
+					}
+					else {
+						d->DeleteDan(p);
+					}
+					
 				}
 			}
 			
@@ -2743,9 +3245,11 @@ public:
 		}
 		return false;
 	}
+	
+	//ミスしてから当たり判定再開までの処理
 	int Jiki::MissEffect(Stage *stage){
 		int r = 0;
-		stage->missflame++;
+		
 		if (stage->missflame == 2){
 			if (j.extendcount < 0){
 
@@ -2762,7 +3266,7 @@ public:
 				stage->SetItem(j.x, j.y + up, 0, 10, 0);
 			}
 		}
-		if (stage->missflame == 120){//ミスしてから2秒後に操作可能となる。
+		if (stage->missflame > 119){//ミスしてから2秒後に操作可能となる。
 			stage->Miss = false;
 			stage->SpellBonusScore = 0;
 			stage->missnothit = 180;
@@ -2796,21 +3300,31 @@ public:
 		}
 		return r;
 	}
+
+	//ボス相手のミス判定
 	bool Jiki::BossMissJudgement(double bx, double by, int br, Stage * stage){
 		if (stage->missnothit == 0 && sqrt(pow(bx - j.x, 2.0) + pow(by - j.y, 2.0)) < br + j.hitr){
 			return true;
 		}
 		return false;
 	}
+	
+	//内角の計算
 	double Jiki::InnerMulti(const vector<int>&a,const vector<int>&b){
 		return a[0] * b[0] + a[1] * b[1];
 	}
+	
+	//外角の計算
 	double Jiki::OuterMulti(const vector<int>&a, const vector<int>&b){
 		return a[0] * b[1] - a[1] * b[0];
 	}
+	
+	//ベクトルの長さの計算
 	double Jiki::PowMulti(const vector<int>&a){
 		return a[0] * a[0] + a[1] * a[1];
 	}
+	
+	//敵の使い魔に対するホーミング処理
 	void Jiki::TukaimaCheckHoming(Stage* stage){//ホーミング弾に対する処理の必要性を判断し、正ならその処理をします。
 		int searchr = 0;
 		int p = stage->tukaima[0].np;
@@ -2868,6 +3382,8 @@ public:
 			shotp = shot[shotp].np;
 		}
 	}
+	
+	//使い魔に対する当たり判定
 	void Jiki::TukaimaHitJudgement(int flame, Stage *stage){
 		//自機のショットが敵に当たるかどうかを判断する関数です。ショットが当たると敵のHPを減らし、0になれば撃沈の処理をします。また当たればtrueを返して終了します。
 		int p = stage->tukaima[0].np;
@@ -2983,6 +3499,679 @@ public:
 		}
 	}
 
+	//ボム発動処理
+	void Jiki::SetBomb(int b) {
+		bomb[0].power = b;
+		bombtime = 0;
+		int p;
+		if (b < 20) {
+			//高速ボム
+			s1.eff.RequestSE(25);
+		}
+		else {
+			//低速ボム
+			s1.eff.RequestSE(25);
+		}
+		switch (b) {
+		case 10://道符「三元五徳八会の気」
+			{
+			p = bomb[0].np;
+			bomb[p].imgp = bimg.san1;
+			bomb[p + 1].imgp = bimg.san2;
+			bomb[p + 2].imgp = bimg.san3;
+			bomb[p].x = cos(150 * PI / 180) * 50 + j.x;
+			bomb[p].y = sin(150 * PI / 180) * 50 + j.y;
+			bomb[p + 1].x = cos(270 * PI / 180) * 50 + j.x;
+			bomb[p + 1].y = sin(270 * PI / 180) * 50 + j.y;
+			bomb[p + 2].x = cos(30 * PI / 180) * 50 + j.x;
+			bomb[p + 2].y = sin(30 * PI / 180) * 50 + j.y;
+			bomb[0].pp = p + 3;
+			for (int pp = 1; pp < 4; pp++) {
+				bomb[pp].power = 500;
+				bomb[pp].pp = pp - 1;
+				bomb[pp].np = pp + 1;
+			}
+
+
+			}
+			break;
+		case 11://妖霊「幽幻乱舞」
+			{
+			bomb[1].imgp = bimg.back1;
+			bomb[1].x = 212;
+			bomb[1].y = 243;
+			bomb[1].power = 5;
+			bomb[1].pp = 0;
+			bomb[1].np = 2;
+			bomb[0].pp = 2;
+			}
+			break;
+		case 12://奇跡「ミラクルフルーツ」
+			{
+			int k = 1;
+			for (p = bomb[0].np; p < 7; p++) {
+				bomb[p].x = GetRand(384) + 20;
+				bomb[p].y = GetRand(450) + 15;
+				bomb[p].vecx = cos(k * PI / 180) * 3;
+				bomb[p].vecy = sin(k * PI / 180) * 3;
+				bomb[p].imgp = bimg.fruit;
+				bomb[p].power = 150;
+				bomb[p].pp = p - 1;
+				bomb[p].np = p + 1;
+				k += 60;
+			}
+			bomb[0].pp += 6;
+			}
+			break;
+		case 13://幻符「殺人ドール」
+			{
+			double k = 210;//320
+			for (p = bomb[0].np; p < 21; p++) {
+				bomb[p].x = cos(k * PI / 180) * 3 + j.x;
+				bomb[p].y = sin(k * PI / 180) * 3 + j.y;
+				bomb[p].vecx = cos(k * PI / 180) * 3;
+				bomb[p].vecy = sin(k * PI / 180) * 3;
+				bomb[p].imgp = bimg.knife1;
+				bomb[p].angle = k * PI / 180;
+				bomb[p].power = 2;
+				bomb[p].pp = p - 1;
+				bomb[p].np = p + 1;
+				k += 5.5;
+			}
+			bomb[0].pp += 20;
+			}
+			break;
+		case 20://天符「天の磐舟よ天へ昇れ」
+			{}
+			break;
+		case 21://魔光「トワイライトスパーク」
+			{}
+			break;
+		case 22://秘術「グレイソーマタージ」
+			{}
+			break;
+		case 23://時符「プライベートスクウェア」
+			{}
+			break;
+		}
+	}
+
+	//ボム処理
+	void Jiki::ProcessBomb() {
+		bombtime++;
+		int pp = 0;
+		int p = bomb[0].np;
+		while (p != bomb[0].pp) {//ボム弾幕処理
+			switch (bomb[0].power) {
+			case 10://道符「三元五徳八会の気」
+			{
+				
+				if (bomb[p].imgp == bimg.san1 || bomb[p].imgp == bimg.san2 || bomb[p].imgp == bimg.san3) {
+					bomb[p].x += bomb[p].vecx;
+					bomb[p].y += bomb[p].vecy;
+				}
+				else {
+					if (bomb[p].imgp == bimg.go) {
+						
+						if (bombtime - bomb[p].start > 39) {
+							bomb[p].x += cos(bomb[p].angle) * 3;
+							bomb[p].y += sin(bomb[p].angle) * 3;
+						}
+					}
+					else {
+						bomb[p].x = cos(bomb[p].vecx * PI / 180) * bomb[p].vecy + j.x;
+						bomb[p].y = sin(bomb[p].vecx * PI / 180) * bomb[p].vecy + j.y;
+						bomb[p].vecy += 3;
+						if (p % 2 == 0) {
+							bomb[p].vecx += 4;
+							if (bomb[p].vecx > 360) {
+								bomb[p].vecx -= 360;
+							}
+						}
+						else {
+							bomb[p].vecx -= 4;
+							if (bomb[p].vecx < 0) {
+								bomb[p].vecx += 360;
+							}
+						}
+					}
+				}
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
+				if (p == bomb[0].np) {
+					DrawGraph(1, 1, bimg.futo_fast, true);
+				}
+				DrawRotaGraph((int)(bomb[p].x),(int)(bomb[p].y), 1, bomb[p].angle, bomb[p].imgp, true);
+				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+				//DrawCircle((int)(bomb[p].x), (int)(bomb[p].y), 5, GetColor(255, 255, 255), true, 1);
+			}
+			break;
+			case 11://妖霊「幽幻乱舞」
+			{
+				if (bomb[p].imgp == bimg.back2) {
+					if (bombtime % 2 == 0) {
+						bomb[p].x -= 9;
+					}
+					else {
+						bomb[p].x += 9;
+					}
+				}
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);				
+				DrawRotaGraph((int)(bomb[p].x), 243, 1, bomb[p].angle, bomb[p].imgp, true);
+				if (bomb[p].imgp == bimg.back2) {
+					DrawGraph(1, 1, bimg.mima_fast, true);
+				}
+				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+			}
+			break;
+			case 12://奇跡「ミラクルフルーツ」
+			{
+				bomb[p].x += bomb[p].vecx;
+				bomb[p].y += bomb[p].vecy;
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
+				if (p == bomb[0].np) {
+					DrawGraph(1, 1, bimg.sanae_fast, true);
+				}
+				DrawRotaGraph((int)(bomb[p].x), (int)(bomb[p].y), 1, bomb[p].angle, bomb[p].imgp, true);
+				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+			}
+			break;
+			case 13://幻符「殺人ドール」
+			{
+				bomb[p].x += bomb[p].vecx;
+				bomb[p].y += bomb[p].vecy;
+				SetDrawBlendMode(DX_BLENDMODE_ALPHA, 150);
+				if (p == bomb[0].np) {
+					DrawGraph(1, 150, bimg.sakuya_fast, true);
+				}
+				DrawRotaGraph((int)(bomb[p].x), (int)(bomb[p].y), 1, bomb[p].angle, bomb[p].imgp, true);
+				SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 0);
+			}
+			break;
+			case 20://天符「天の磐舟よ天へ昇れ」
+			{}
+			break;
+			case 21://魔光「トワイライトスパーク」
+			{}
+			break;
+			case 22://秘術「グレイソーマタージ」
+			{}
+			break;
+			case 23://時符「プライベートスクウェア」
+			{}
+			break;
+			}
+			if (bomb[p].x < -200 || bomb[p].x > 680 || bomb[p].y < -200 || bomb[p].y > 680) {
+				//画面外にはみ出したら削除
+				DeleteBomb(p);
+			}
+			p = bomb[p].np;
+		}
+		switch (bomb[0].power) {//ボム弾幕の出減処理
+		case 10://道符「三元五徳八会の気」
+		{
+			if (bomb[0].x != 0) {
+				pp = 0;
+			}
+			switch (bombtime) {
+			case 20:
+				for (p = 1; p < 4; p++) {
+					switch (p) {
+					case 1:
+						bomb[p].x = cos(150 * PI / 180) * 50 + j.x;
+						bomb[p].y = sin(150 * PI / 180) * 50 + j.y;
+						bomb[p].vecx = cos(225 * PI / 180) * 2;
+						bomb[p].vecy = sin(225 * PI / 180) * 2;
+						bomb[p].imgp = bimg.san1;
+						break;
+					case 2:
+						bomb[p].x = cos(270 * PI / 180) * 50 + j.x;
+						bomb[p].y = sin(270 * PI / 180) * 50 + j.y;
+						bomb[p].vecx = cos(270 * PI / 180) * 2;
+						bomb[p].vecy = sin(270 * PI / 180) * 2;
+						bomb[p].imgp = bimg.san2;
+						break;
+					case 3:
+						bomb[p].x = cos(30 * PI / 180) * 50 + j.x;
+						bomb[p].y = sin(30 * PI / 180) * 50 + j.y;
+						bomb[p].vecx = cos(315 * PI / 180) * 2;
+						bomb[p].vecy = sin(315 * PI / 180) * 2;
+						bomb[p].imgp = bimg.san3;
+						break;
+					}
+				}
+				bomb[0].pp = 4;
+				break;
+			case 60:
+				for (p = bomb[0].pp; p < bomb[0].pp + 3; p++) {
+					bomb[p].power = 500;
+					
+					switch (p) {
+					case 4:
+						bomb[p].x = cos(150 * PI / 180) * 50 + j.x;
+						bomb[p].y = sin(150 * PI / 180) * 50 + j.y;
+						bomb[p].vecx = cos(225 * PI / 180) * 2;
+						bomb[p].vecy = sin(225 * PI / 180) * 2;
+						bomb[p].imgp = bimg.san1;
+						int a;
+						pp = bomb[p].np;
+						while (pp != bomb[0].pp) {
+							a = pp;
+							pp = bomb[pp].np;
+						}
+						bomb[p].pp = a;
+						bomb[p].np = p + 1;
+						break;
+					case 5:
+						bomb[p].x = cos(270 * PI / 180) * 50 + j.x;
+						bomb[p].y = sin(270 * PI / 180) * 50 + j.y;
+						bomb[p].vecx = cos(270 * PI / 180) * 2;
+						bomb[p].vecy = sin(270 * PI / 180) * 2;
+						bomb[p].imgp = bimg.san2;
+						bomb[p].pp = p - 1;
+						bomb[p].np = p + 1;
+						break;
+					case 6:
+						bomb[p].x = cos(30 * PI / 180) * 50 + j.x;
+						bomb[p].y = sin(30 * PI / 180) * 50 + j.y;
+						bomb[p].vecx = cos(315 * PI / 180) * 2;
+						bomb[p].vecy = sin(315 * PI / 180) * 2;
+						bomb[p].imgp = bimg.san3;
+						bomb[p].pp = p - 1;
+						bomb[p].np = p + 1;
+						break;
+					}
+					
+				}
+				bomb[0].pp = 7;
+				break;
+			case 100:
+				p = bomb[0].pp;
+				for (int k = 179; k < 360; k += 36) {
+					bomb[p].imgp = bimg.go;
+					bomb[p].x = cos(k * PI / 180) * 20 + j.x;
+					bomb[p].y = sin(k * PI / 180) * 20 + j.y;
+					bomb[p].angle = k * PI / 180;
+					bomb[p].power = 120;
+					bomb[p].start = bombtime;
+					bomb[p].pp = p - 1;
+					bomb[p].np = p + 1;
+					if (p == 0) {
+						p = 0;
+					}
+					p++;
+				}
+				bomb[0].pp = p;
+				
+				break;
+			case 160:
+				p = bomb[0].pp;
+				for (int k = 179; k < 360; k += 36) {
+					bomb[p].imgp = bimg.go;
+					bomb[p].x = cos(k * PI / 180) * 20 + j.x;
+					bomb[p].y = sin(k * PI / 180) * 20 + j.y;
+					bomb[p].angle = k * PI / 180;
+					bomb[p].power = 120;
+					bomb[p].start = bombtime;
+					bomb[p].pp = p - 1;
+					bomb[p].np = p + 1;
+					p++;
+				}
+				bomb[0].pp = p;
+				break;
+			case 220:
+				p = bomb[0].pp;
+				for (int k = 179; k < 360; k += 36) {
+					bomb[p].imgp = bimg.go;
+					bomb[p].x = cos(k * PI / 180) * 20 + j.x;
+					bomb[p].y = sin(k * PI / 180) * 20 + j.y;
+					bomb[p].angle = k * PI / 180;
+					bomb[p].power = 120;
+					bomb[p].start = bombtime;
+					bomb[p].pp = p - 1;
+					bomb[p].np = p + 1;
+					p++;
+					
+				}
+				bomb[0].pp = p;
+				break;
+			case 240:
+				pp = bomb[0].pp;
+				for (int k = 1; k < 315; k += 45) {
+					bomb[pp].imgp = bimg.hachi;
+					bomb[pp].x = j.x;
+					bomb[pp].y = j.y;
+					bomb[pp].vecx = k;
+					bomb[pp].vecy = 0;
+					bomb[pp].angle = k * PI / 180;
+					bomb[pp].power = 150;
+					bomb[pp].pp = pp - 1;
+					bomb[pp].np = pp + 1;
+					if (pp == 0) {
+						pp = 0;
+					}
+					pp++;
+				}
+				bomb[0].pp = pp;
+				break;
+			case 300:
+				pp = bomb[0].pp;
+				for (int k = 1; k < 315; k += 45) {
+					bomb[pp].imgp = bimg.hachi;
+					bomb[pp].x = j.x;
+					bomb[pp].y = j.y;
+					bomb[pp].vecy = 0;
+					bomb[pp].vecx = k;
+					bomb[pp].angle = k * PI / 180;
+					bomb[pp].power = 150;
+					bomb[pp].pp = pp - 1;
+					bomb[pp].np = pp + 1;
+					pp++;
+				}
+				bomb[0].pp = pp;
+				break;
+			case 360:
+				pp = bomb[0].pp;
+				for (int k = 1; k < 315; k += 45) {
+					bomb[pp].imgp = bimg.hachi;
+					bomb[pp].x = j.x;
+					bomb[pp].y = j.y;
+					bomb[pp].vecx = k;
+					bomb[pp].vecy = 0;
+					bomb[pp].angle = k * PI / 180;
+					bomb[pp].power = 150;
+					bomb[pp].pp = pp - 1;
+					bomb[pp].np = pp + 1;
+					pp++;
+				}
+				bomb[0].pp = pp;
+				break;
+			}
+
+
+			if (bombtime >= 480) { ClearBomb(); }
+		}
+		break;
+		case 11://妖霊「幽幻乱舞」
+		{
+			if (bombtime == 120) {
+			bomb[2].imgp = bimg.back2;
+				bomb[2].x = 212;
+				bomb[2].y = 243;
+				bomb[2].power = 14;
+				bomb[1].power = 0;
+				bomb[2].pp = 1;
+				bomb[2].np = 3;
+				bomb[0].pp = 3;
+			}
+			if (bombtime >= 360) { ClearBomb(); }
+		}
+		break;
+		case 12://奇跡「ミラクルフルーツ」
+		{
+			if (bombtime % 15 == 0) {
+				int b = (bombtime % 60) / 15 - 1;
+				int f[4] = { 1 , 9 , 14 , 23 };
+				int k = f[b];
+				for (p = bomb[0].pp;p <  bomb[0].pp + 7; p++) {
+					bomb[p].x = GetRand(384) + 20;
+					bomb[p].y = GetRand(450) + 15;
+					bomb[p].vecx = cos(k * PI / 180) * 3;
+					bomb[p].vecy = sin(k * PI / 180) * 3;
+					bomb[p].imgp = bimg.fruit;
+					bomb[p].power = 150;
+					bomb[p].pp = p - 1;
+					bomb[p].np = p + 1;
+					k += 60;
+				}
+				bomb[0].pp += 6;
+			}
+			if (bombtime >= 300) { ClearBomb(); }
+		}
+		break;
+		case 13://幻符「殺人ドール」
+		{
+			if (bombtime % 25 == 0 && bombtime < 500) {
+				double k = 210;
+				for (p = bomb[0].pp; p < bomb[0].pp + 21; p++) {
+					bomb[p].x = cos(k * PI / 180) * 3 + j.x;
+					bomb[p].y = sin(k * PI / 180) * 3 + j.y;
+					bomb[p].vecx = cos(k * PI / 180) * 3;
+					bomb[p].vecy = sin(k * PI / 180) * 3;
+					bomb[p].imgp = bimg.knife1;
+					bomb[p].start = bombtime;
+					bomb[p].angle = k * PI / 180;
+					bomb[p].power = 2;
+					bomb[p].pp = p - 1;
+					bomb[p].np = p + 1;
+					k += 5.5;
+				}
+				bomb[0].pp += 20;
+			}
+			if (bombtime >= 720 && bomb[0].pp == bomb[0].np) { 
+				ClearBomb(); 
+			}
+		}
+		break;
+		case 20://天符「天の磐舟よ天へ昇れ」
+		{}
+		break;
+		case 21://魔光「トワイライトスパーク」
+		{}
+		break;
+		case 22://秘術「グレイソーマタージ」
+		{}
+		break;
+		case 23://時符「プライベートスクウェア」
+		{}
+		break;
+		}
+		if (bomb[0].pp > 400) {
+			bomu refb[501];
+			int rp = 0;
+			int pp = 0;
+			while (rp != bomb[0].pp) {
+				refb[pp].x = bomb[rp].x;
+				refb[pp].y = bomb[rp].y;
+				refb[pp].vecx = bomb[rp].vecx;
+				refb[pp].vecy = bomb[rp].vecy;
+				refb[pp].imgp = bomb[rp].imgp;
+				refb[pp].angle = bomb[rp].angle;
+				refb[pp].power = bomb[rp].power;
+				refb[pp].home = bomb[rp].home;
+				rp = bomb[rp].np;
+				pp++;
+			}
+			int t = bombtime;
+			ClearBomb();
+			bombtime = t;
+			bomb[0].pp = pp;
+			bomb[0].np = 1;
+			rp = 0;
+			while (rp != bomb[0].pp) {
+				bomb[rp].x = refb[rp].x;
+				bomb[rp].y = refb[rp].y;
+				bomb[rp].vecx = refb[rp].vecx;
+				bomb[rp].vecy = refb[rp].vecy;
+				bomb[rp].imgp = refb[rp].imgp;
+				bomb[rp].angle = refb[rp].angle;
+				bomb[rp].power = refb[rp].power;
+				bomb[rp].home = refb[rp].home;
+				if (rp > 0) {
+					bomb[rp].pp = rp - 1;
+					bomb[rp].np = rp + 1;
+				}
+				rp++;
+			}
+			rp = 0;
+		}
+	}
+	
+	//ボム弾幕雑魚相手ホーミング
+	void Jiki::BombHoming(Stage * stage, int limit) {
+		int bp = bomb[0].np; 
+		int p,sp;
+		double shortest, r;
+		limit = (int)(pow(limit, 2.0));
+		while (bp != bomb[0].pp) {
+			p = stage->teki[0].np;
+			shortest = 100000;
+			sp = 0;
+			while (p != stage->tail && (bombtime - bomb[bp].start) > ((bomb[0].power == 10 ) ? 69 : 14) && stage->teki[p].ready == 0 && (bomb[bp].imgp == bimg.go|| bomb[bp].imgp == bimg.knife1 || bomb[bp].imgp == bimg.knife2)) {
+				r = pow(stage->teki[p].x - bomb[bp].x, 2.0) + pow(stage->teki[p].y - bomb[bp].y, 2.0);
+				if (r < limit && r < shortest) {
+					shortest = r;
+					sp = p;
+				}
+				p = stage->teki[p].np; 
+			}
+			if (shortest != 100000) {
+				if (stage->teki[sp].hitpoint > 0 && (bomb[bp].home == 0 || bomb[bp].home == sp)) {
+					bomb[bp].home = sp;
+					double angle = atan2(stage->teki[sp].y - bomb[bp].y, stage->teki[sp].x - bomb[bp].x);
+					bomb[bp].angle = angle;
+					if (bomb[0].power == 10) {
+						bomb[bp].vecx = cos(angle) * 20;
+						bomb[bp].vecy = sin(angle) * 20;
+					}
+					else {
+						bomb[bp].vecx = cos(angle) * 7;
+						bomb[bp].vecy = sin(angle) * 7;
+						bomb[bp].imgp = bimg.knife2;
+					}
+					
+				}
+			}
+			bp = bomb[bp].np;
+		}
+	}
+
+	//ボム弾幕ボス相手ホーミング
+	void Jiki::BombHoming(double bx, double by, double bx2, double by2 ,int limit) {//単体ボス相手の場合はbx2,by2共に0とする。
+		int bp = bomb[0].np;
+		
+		limit = (int)(pow(limit, 2.0));
+		while (bp != bomb[0].pp) {
+			if(bomb[bp].imgp == bimg.go || bomb[0].power == 13)
+				if (bx2 == 0 && by2 == 0) {
+					if (pow(bx - bomb[bp].x, 2.0) + pow(by - bomb[bp].y, 2.0) < pow(limit, 2.0) && (bombtime - bomb[bp].start) > ((bomb[0].power == 10) ? 69 : 30)) {
+						double angle = atan2(by - bomb[bp].y, bx - bomb[bp].x);
+						bomb[bp].angle = angle;
+						if (bomb[0].power == 10) {
+							bomb[bp].vecx = cos(angle) * 20;
+							bomb[bp].vecy = sin(angle) * 20;
+						}
+						else {
+							bomb[bp].vecx = cos(angle) * 7;
+							bomb[bp].vecy = sin(angle) * 7;
+							bomb[bp].imgp = bimg.knife2;
+						}
+					}
+				}
+				else {
+					double br1, br2, angle;
+					angle = -1;
+					br1 = pow(bx - bomb[bp].x, 2.0) + pow(by - bomb[bp].y, 2.0);
+					br2 = pow(bx2 - bomb[bp].x, 2.0) + pow(by2 - bomb[bp].y, 2.0);
+					if ((bombtime - bomb[bp].start) > ((bomb[0].power == 10) ? 69 : 14)) {
+						if (br1 < limit && br1 < br2) {
+
+							angle = atan2(by - bomb[bp].y, bx - bomb[bp].x);
+						}
+						else {
+							if (br2 < limit) {
+								angle = atan2(by2 - bomb[bp].y, bx2 - bomb[bp].x);
+							}
+						}
+						if (angle != -1) {
+							bomb[bp].angle = angle;
+							if (bomb[0].power == 10) {
+								bomb[bp].vecx = cos(angle) * 20;
+								bomb[bp].vecy = sin(angle) * 20;
+							}
+							else {
+								bomb[bp].vecx = cos(angle) * 3;
+								bomb[bp].vecy = sin(angle) * 3;
+								bomb[bp].imgp = bimg.knife2;
+							}
+						}
+					}
+				}
+			bp = bomb[bp].np;
+		}
+	}
+	//ボム削除
+	void Jiki::DeleteBomb(int bp) {
+		bomb[bomb[bp].pp].np = bomb[bp].np;
+		bomb[bomb[bp].np].pp = bomb[bp].pp;
+	}
+
+	//ボム終了＆初期化
+	void Jiki::ClearBomb() {
+		for (int b = 0; b < 501; b++) {
+			bomb[b].x = 0;
+			bomb[b].y = 0;
+			bomb[b].vecx = 0;
+			bomb[b].vecy = 0;
+			bomb[b].imgp = 0;
+			bomb[b].home = 0;
+			bomb[b].start = 0;
+			bomb[b].power = 0;
+			bomb[b].pp = 0;
+			bomb[b].np = 0;
+		}
+		bomb[0].np = 1;//root
+		bomb[0].pp = 1;//tail
+		bombtime = -1;
+		s1.eff.StopSE(24);
+		s1.eff.StopSE(25);
+	}
+
+	//ボムデータの読み込み
+	void Jiki::LoadBomb() {
+		_chdir("data");
+		_chdir("img");
+		_chdir("Game");
+		_chdir("Jiki");
+		_chdir("bomb");
+		switch (jikinum) {
+		case 0:
+			bimg.boat = LoadGraph("futo.bomb-slow.1.png");
+			bimg.water1 = LoadGraph("futo.bomb-slow.2.png");
+			bimg.water2 = LoadGraph("futo.bomb-slow.3.png");
+			bimg.san1 = LoadGraph("futo.bomb-fast.1.png");
+			bimg.san2 = LoadGraph("futo.bomb-fast.2.png");
+			bimg.san3 = LoadGraph("futo.bomb-fast.3.png");
+			bimg.go = LoadGraph("futo.bomb-fast.4.png");
+			bimg.hachi = LoadGraph("futo.bomb-fast.5.png");
+			bimg.futo_fast = LoadGraph("Futo.bomb.png");
+			break;
+		case 1:
+			bimg.back1 = LoadGraph("mima.bomb-fast.1.png");
+			bimg.back2 = LoadGraph("mima.bomb-fast.2.png");
+			bimg.mima_fast = LoadGraph("Mima.bomb.png");
+			bimg.spark = LoadGraph("mima.bomb-slow.1.png");
+			break;
+		case 2:
+			bimg.fruit = LoadGraph("sanae.bomb-fast.1.png");
+			bimg.sanae_fast = LoadGraph("Sanae.bomb.png");
+			bimg.gray = LoadGraph("sanae.bomb-slow.1.png");
+			break;
+		case 3:
+			bimg.knife1 = LoadGraph("sakuya.bomb-fast.1.png");
+			bimg.knife2 = LoadGraph("sakuya.bomb-fast.2.png");
+			bimg.sakuya_fast = LoadGraph("Sakuya.bomb.png");
+			bimg.square1 = LoadGraph("sakuya.bomb-slow.1.png");
+			bimg.square2 = LoadGraph("sakuya.bomb-slow.2.png");
+			break;
+		}
+		_chdir("..");
+		_chdir("..");
+		_chdir("..");
+		_chdir("..");
+		_chdir("..");
+	}
+
+	//レコードの読み込み
 	void Jiki::LoadRecord(){
 		if (1){//各自機の記録内に全面クリアの記録があった場合
 			FinalChoice = true;
@@ -3054,6 +4243,53 @@ public:
 	short jikinum;//ゲーム中の自機を識別する変数です。0.布都　1.魅魔　2.早苗　3.咲夜
 	int jikistand[4][15];//[jikijum][1.common,2.fine,3.question,4.doubt,5.angry,6.surprised,7.amazed(呆れる),8.excited,9.strategy]
 	bool FinalChoice;//ラストステージを選択できるかどうかを示す変数です。LoadRecordにてClear(全面クリア)の記録があった時のみファイナル分岐を選択できます。
+	struct bomu {
+		double x;
+		double y;
+		double vecx;//1フレームごとのY方向の移動距離
+		double vecy;//1フレームごとのY方向の移動距離
+		int power;//ボムの種類ごとに設定されるボム威力
+		int imgp;//画像ハンドル
+		int home;//ホーミング先のポインタ。ボス戦では使われないが複数ボスの場合は使われる。
+		double angle;//画像の回転角度
+		short start;//ボム弾幕が設置されたときのbombtime。ホーミング弾の処理で使われる。
+		short pp;//前ポインタ
+		short np;//次ポインタ
+	};
+	bomu bomb[501];//bombshu(ボムの種類)はbomb[0].power,rootはbomb[0].npに、tailはbomb[0].ppに記録
+	const struct Bimg {
+		//futo_slow
+		 int boat;
+		 int water1;
+		 int water2;
+		 
+		//futo_fast
+		 int san1;
+		 int san2;
+		 int san3;
+		 int go;//ボム中はホーミング処理を行うがProcessBomb中ではなくProcessGame中にStage->tekiないしbossを引数にして行うものとする。
+		 int hachi;
+		 int futo_fast;
+		//mima_fast
+		 int back1;
+		 int back2;
+		 int mima_fast;
+		//mima_slow
+		 int spark;
+		//sanae_fast
+		 int fruit;
+		 int sanae_fast;
+		//sanae_slow
+		 int gray;
+		//sakuya_fast
+		 int knife1;//ボム中はホーミング処理を行うがProcessBomb中ではなくProcessGame中にStage->tekiないしbossを引数にして行うものとする。
+		 int knife2;
+		 int sakuya_fast;
+		//sakuya_slow
+		 int square1;
+		 int square2;
+	};
+	Bimg bimg;
 	bool  debuging;
 private:
 
@@ -3112,7 +4348,7 @@ private:
 	double sakuyaopkakudo;//左右移動時にオプションの位置が変わるため傾きの角度を保持する変数。咲夜のみ。
 	short slowkakudo;
 	char* JikiName;//ゲーム中の自機の名前です。Stage1～6Bクラスから受け取ります。
-
+	short bombtime;//ゲーム中のボムの発動時間を示す変数です。自機及び低速か高速かで時間は異なり、bombtimeが一定時間になるまではProcessBombが起動されます。
 
 	int bombicon[2];//0.count 1.empty 
 	int zankiicon[2];//0.count 1.empty
@@ -3133,6 +4369,7 @@ private:
 	vector<int>l;
 	
 };
+
 class Game{
 public:
 	Jiki jiki;

@@ -112,7 +112,7 @@ public:
 		ClearEnemyData();
 		ClearItemData();
 		if (PlayerData.practice){
-			TenBonus = 10000;
+			TenBonus = 55600;
 		}
 		else{
 			if (stagename == "Stage1"){
@@ -608,7 +608,8 @@ public:
 					}
 					else{
 						// 20x/15y～404x/465yの範囲内ならば普通に描写。
-						if (DrawGraph((int)(teki[p].x) - 21, (int)(teki[p].y) - 21, Enemy[teki[p].tekishu][teki[p].imgposi], TRUE) != 0){ r = -1; }
+						if (DrawGraph((int)(teki[p].x - 21), (int)(teki[p].y - 21), Enemy[teki[p].tekishu][teki[p].imgposi], TRUE) != 0){ r = -1; }
+						//DrawCircle((int)(teki[p].x), (int)(teki[p].y), 5, GetColor(200, 20, 20), true);
 					}
 				}
 				else{
@@ -618,7 +619,7 @@ public:
 							DeleteEnemy(p);
 						}
 						else{
-							if (DrawGraph((int)(teki[p].x) - 38, (int)(teki[p].y) - 38, Enemy[teki[p].tekishu][teki[p].imgposi], TRUE) != 0){ r = -1; }
+							if (DrawGraph((int)(teki[p].x - 30), (int)(teki[p].y - 36), Enemy[teki[p].tekishu][teki[p].imgposi], TRUE) != 0){ r = -1; }
 						}
 					}
 					else{//綿毛
@@ -627,7 +628,7 @@ public:
 							DeleteEnemy(p);
 						}
 						else{
-							if (DrawGraph((int)(teki[p].x) - 21, (int)(teki[p].y) - 21, Enemy[teki[p].tekishu][teki[p].imgposi], TRUE) != 0){ r = -1; }
+							if (DrawGraph((int)(teki[p].x - 20), (int)(teki[p].y - 20), Enemy[teki[p].tekishu][teki[p].imgposi], TRUE) != 0){ r = -1; }
 						}
 					}
 				}
@@ -705,17 +706,17 @@ public:
 		}
 	}
 	void Stage::ProcessTalk(char * jikiname,int jikicolor, char * &talkevent,
-		int stdnum[],int jy, int by1, char * bossname1, int bossstand1[], int bosscolor1){
+		int jy, int by1, char * bossname1, int bossstand1[], int bosscolor1){
 		//最初にセリフデータを読み込む。
 		talk.nowtalk = 1;//自機と敵両方表示
 		int n;
 		char * stx = "";
 		char * nowtalk = "";
-		char * data = "";
+		char data[100];
 		//キャラ名:表情添字:トーク内容1:トーク内容2
-		FileRead_gets(data, 70, Talkfile);
+		FileRead_gets(data, 100, Talkfile);
 		nowtalk = strtok_s(data, ":", &stx);
-		if (nowtalk == "※"){
+		if (strcmp(nowtalk, "※") == 0){
 			//BGM変更などのトークイベントの際にはイベント内容をtalkeventに記録し関数を終了する。
 			talkevent = strtok_s(NULL, ":", &stx);
 			return;
@@ -751,7 +752,8 @@ public:
 			if (jstand[n] < 1){
 				n = 1;
 			}
-			stdnum[0] = n;
+			
+			talk.jstand = jstand[n];
 		}
 		else{
 			talk.lateupdate = 0;
@@ -759,10 +761,17 @@ public:
 			if (bossstand1[n] < 1){
 				n = 1;
 			}
-			stdnum[1] = n;
+			
+			talk.bossstand1 = bossstand1[n];
 		}
+		
 		talk.selif1 = strtok_s(NULL, ":", &stx);
-		talk.selif2 = strtok_s(NULL, ":", &stx);
+		if (strcmp(stx, "") != 0) {
+			talk.selif2 = strtok_s(NULL, ":", &stx);
+		}
+		else {
+			talk.selif2 = "";
+		}
 	}
 	
 	void Stage::ProcessTalk2(char * jname, int jikicolor, char * &talkevent
@@ -848,7 +857,7 @@ public:
 					if (bossstand2[n] < 1){
 						n = 1;
 					}
-					talk.bossstand2 = bossstand2[1];
+					talk.bossstand2 = bossstand2[n];
 					talk.lateupdate = 4;
 				}
 				else{
@@ -936,7 +945,7 @@ public:
 			DrawGraph(200, by1, talk.bossstand1, true);
 			break;
 		case 6://二人のボスの共鳴
-			DrawGraph(-10, jy, talk.jstand, true);
+			DrawGraph(-20, jy, talk.jstand, true);
 			SetDrawBright(255, 255, 255);
 			DrawGraph(230, by2, talk.bossstand2, true);
 			DrawGraph(150, by1, talk.bossstand1, true);
@@ -989,6 +998,8 @@ public:
 			DrawGraph(170, by, talk.bossstand1, true);
 			break;
 		}
+		DrawBox(25, 400, 400, 460, GetColor(80, 80, 80), true);
+		DrawBox(26, 401, 399, 459, GetColor(0, 0, 0), true);
 		if (talk.nowtalk < 5){
 			DrawFormatStringToHandle(28, 406, talk.color, Talkfont, "%s", talk.selif1.c_str());
 			if (selif2 != NULL){
@@ -1011,9 +1022,9 @@ public:
 			len = strlen(BossName) * 20;
 		}
 		int l = (int)(len);
-		DrawBox(bossx - 2, 348, bossx + l + 2, 402, GetColor(100, 100, 100), true);
+		DrawBox(bossx - 2, 348, bossx + l + 2, 402, GetColor(80, 80, 80), true);
 		SetDrawBlendMode(DX_BLENDMODE_NOBLEND,0);
-		DrawStringToHandle(bossx, 350, doublename, GetColor(200,200,200), Smallfont);
+		DrawStringToHandle(bossx, 350, doublename, GetColor(210,210,210), Smallfont);
 		DrawStringToHandle(bossx, 380, BossName, color, Bossnamefont);
 	}
 	void Stage::StartTalk(char* stagename){//指定の会話ファイルを読み込みます。
@@ -1068,6 +1079,7 @@ public:
 		return r;
 	}
 	void Stage::EndSpellkardEffect(int clearscore ,int bonusscore){
+		//bonusscoreはSpellBonusScoreから引き継がれるが、時間減少及びボム・ミスによるボーナス喪失により値が変化するため別途に扱う。
 		DrawStringToHandle(100, 40, "Clear Bonus", GetColor(200, 200, 20), ClearBonusfont);
 		DrawFormatStringToHandle(210, 40,  GetColor(200, 200, 20), ClearBonusfont,"%d",clearscore);
 		if (bonusscore != 0){
@@ -1106,7 +1118,7 @@ public:
 				break;
 			}
 			DrawFormatString(20,30,GetColor(255,255,255),"%s",BossName);
-			DrawFormatString(360,20,GetColor(255,255,255),"%d",Bosstime);
+			DrawFormatString(360, 20, GetColor(255, 255, 255), "%d", Bosstime);
 			int xx = 20;
 			for (restphase; restphase > 0; restphase--){
 				DrawGraph(xx, 50, rest, true);
@@ -1331,6 +1343,7 @@ public:
 		static short excited;
 		static short strategy;
 		static short cry;
+		static short despair;
 	};
 	STANDACT StandAct;
 	struct WAVEORDER{
@@ -1489,6 +1502,7 @@ short Stage::STANDACT::amazed = 7;
 short Stage::STANDACT::excited = 8;
 short Stage::STANDACT::strategy = 9;
 short Stage::STANDACT::cry = 10;
+short Stage::STANDACT::despair = 11;
 short Stage::WAVEORDER::daen = 1;
 short Stage::WAVEORDER::twist = 2;
 short Stage::WAVEORDER::round = 3;
